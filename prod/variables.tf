@@ -3,6 +3,12 @@ variable "aws_region" {
   type        = string
 }
 
+variable "cluster_name" {
+  description = "Kubernetes cluster name."
+  type        = string
+}
+
+
 ################################################################################
 # VPC
 ################################################################################
@@ -26,11 +32,6 @@ variable "public_subnets" {
 # Cluster
 ################################################################################
 
-variable "cluster_name" {
-  description = "Kubernetes cluster name."
-  type        = string
-}
-
 variable "worker_group" {
   description = "Configuration for worker group one."
   type = object({
@@ -46,4 +47,13 @@ variable "worker_group" {
 variable "kubeconfig_output_path" {
   description = "Where to save the Kubectl config file. Assumed to be a directory if the value ends with a forward slash /."
   type        = string
+}
+
+################################################################################
+# Application load balancer
+################################################################################
+
+variable "enable_tls" {
+  description = "Whether to enable secure communication over HTTPS. When enabled, HTTP redirects to HTTPS."
+  type        = bool
 }

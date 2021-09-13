@@ -8,6 +8,12 @@ provider "aws" {
   region = var.aws_region
 }
 
+provider "helm" {
+  kubernetes {
+    config_path = module.cluster.kubeconfig_filename
+  }
+}
+
 data "aws_availability_zones" "available" {}
 
 ################################################################################
@@ -18,7 +24,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.66.0"
 
-  name                 = "vpc-${var.cluster_name}"
+  name                 = "${var.cluster_name}-vpc"
   cidr                 = var.cidr
   azs                  = data.aws_availability_zones.available.names
   private_subnets      = var.private_subnets
@@ -66,4 +72,40 @@ module "cluster" {
     max_capacity      = var.worker_group.max_capacity
     target_group_arns = []
   }]
+}
+
+################################################################################
+# Application load balancer
+################################################################################
+
+module "alb" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/alb"
+  name   = "${var.cluster_name}-alb"
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.public_subnets
+
+  enable_irsa             = true
+  oidc_provider_arn       = module.cluster.oidc_provider_arn
+  cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
+
+  enable_tls = var.enable_tls
+}
+
+################################################################################
+# ArgoCD
+################################################################################
+
+module "argocd" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/argocd"
+  chart_version = "3.17.5"
+}
+
+################################################################################
+# Sealed Secrets
+################################################################################
+
+module "sealed_secrets" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/sealed-secrets"
+  chart_version = "1.16.0"
 }
