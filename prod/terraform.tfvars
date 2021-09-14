@@ -24,6 +24,8 @@ public_subnets = [
 
 cluster_name = "kubis-prod"
 
+kubernetes_version = "1.21"
+
 worker_group = {
   name             = "default"
   instance_type    = "t3.xlarge"
@@ -33,7 +35,7 @@ worker_group = {
   spot_price       = "0.06"
 }
 
-kubeconfig_output_path = "./"
+kubeconfig_output_path = "./prod.kubeconfig"
 
 ################################################################################
 # Application load balancer

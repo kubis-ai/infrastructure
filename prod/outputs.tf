@@ -12,3 +12,8 @@ output "cluster_arn" {
   description = "EKS cluster ARN."
   value       = module.cluster.cluster_arn
 }
+
+output "kubeconfig_filename" {
+  description = "Kubeconfig filename."
+  value       = module.cluster.kubeconfig_filename
+}

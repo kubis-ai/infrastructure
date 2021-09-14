@@ -53,8 +53,9 @@ module "vpc" {
 ################################################################################
 
 module "cluster" {
-  source = "git@github.com:kubis-ai/terraform-modules.git//modules/cluster"
-  name   = var.cluster_name
+  source             = "git@github.com:kubis-ai/terraform-modules.git//modules/cluster"
+  name               = var.cluster_name
+  kubernetes_version = var.kubernetes_version
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.public_subnets

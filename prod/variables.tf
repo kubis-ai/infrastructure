@@ -8,6 +8,10 @@ variable "cluster_name" {
   type        = string
 }
 
+variable "kubernetes_version" {
+  description = "Kubernetes version to use for the EKS cluster."
+  type        = string
+}
 
 ################################################################################
 # VPC
