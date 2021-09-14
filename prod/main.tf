@@ -2,6 +2,9 @@ terraform {
   backend "s3" {
     key = "prod/terraform.tfstate"
   }
+
+  # Added in order to use 'optional()' in variables.
+  experiments = [module_variable_optional_attrs]
 }
 
 provider "aws" {
@@ -65,13 +68,15 @@ module "cluster" {
   write_kubeconfig       = true
   kubeconfig_output_path = var.kubeconfig_output_path
 
-  worker_groups = [{
-    name              = var.worker_group.name
-    instance_type     = var.worker_group.instance_type
-    desired_capacity  = var.worker_group.desired_capacity
-    min_capacity      = var.worker_group.min_capacity
-    max_capacity      = var.worker_group.max_capacity
-    target_group_arns = []
+  worker_groups_launch_template = [{
+    name                    = var.worker_group_launch_template.name
+    instance_type           = var.worker_group_launch_template.instance_type
+    override_instance_types = var.worker_group_launch_template.override_instance_types
+    asg_desired_capacity    = var.worker_group_launch_template.asg_desired_capacity
+    asg_min_size            = var.worker_group_launch_template.asg_min_size
+    asg_max_size            = var.worker_group_launch_template.asg_max_size
+    spot_price              = var.worker_group_launch_template.spot_price
+    target_group_arns       = []
   }]
 }
 

@@ -26,13 +26,14 @@ cluster_name = "kubis-prod"
 
 kubernetes_version = "1.21"
 
-worker_group = {
-  name             = "default"
-  instance_type    = "t3.xlarge"
-  desired_capacity = 1
-  min_capacity     = 1
-  max_capacity     = 2
-  spot_price       = "0.06"
+worker_group_launch_template = {
+  name                    = "default"
+  instance_type           = "m5.large"
+  override_instance_types = ["m5.large", "m5a.large", "m5d.large", "m5ad.large"]
+  asg_desired_capacity    = 1
+  asg_min_size            = 1
+  asg_max_size            = 2
+  spot_price              = "0.1"
 }
 
 kubeconfig_output_path = "./prod.kubeconfig"

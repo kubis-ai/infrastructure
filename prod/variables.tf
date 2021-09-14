@@ -36,15 +36,18 @@ variable "public_subnets" {
 # Cluster
 ################################################################################
 
-variable "worker_group" {
+variable "worker_group_launch_template" {
   description = "Configuration for worker group one."
   type = object({
-    name             = string
-    instance_type    = string
-    desired_capacity = number
-    min_capacity     = number
-    max_capacity     = number
-    spot_price       = string
+    name                    = string
+    instance_type           = string
+    asg_desired_capacity    = number
+    asg_min_size            = number
+    asg_max_size            = number
+    spot_price              = string
+    override_instance_types = optional(list(string))
+    on_demand_base_capacity = optional(string)
+    target_group_arns       = optional(list(string))
   })
 }
 
