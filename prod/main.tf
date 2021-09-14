@@ -99,5 +99,17 @@ module "alb" {
 module "argocd" {
   source    = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/argocd"
   namespace = "argocd"
-  variant   = "argocd-vault-plugin"
+
+  variant       = "argocd-vault-plugin"
+  chart_version = "1.3.1"
+}
+
+################################################################################
+# Vault
+################################################################################
+
+module "vault" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/vault"
+  namespace     = "vault"
+  chart_version = "0.15.0"
 }

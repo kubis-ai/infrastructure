@@ -4,7 +4,7 @@ This module constains the definitions for all infrastructure used in Kubis.
 
 ## How to install?
 
-The infrastructure must be provisions in two steps.
+The infrastructure must be provisioned in two steps.
 
 1. Create the remote backend for Terraform. This creates an S3 bucket where Terraform stores the state and a DynamoDB table where Terraform stores the lock. Once created, the parameters of this backend must be copied to `backend-prod.hcl`. The creation of these modules is done locally. After the remote backend is ready, it must be used so that the state is copied.
 

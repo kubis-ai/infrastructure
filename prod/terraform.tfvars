@@ -26,11 +26,11 @@ cluster_name = "kubis-prod"
 
 worker_group = {
   name             = "default"
-  instance_type    = "t3.medium"
+  instance_type    = "t3.xlarge"
   desired_capacity = 1
   min_capacity     = 1
   max_capacity     = 2
-  spot_price       = "0.02"
+  spot_price       = "0.06"
 }
 
 kubeconfig_output_path = "./"
