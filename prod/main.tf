@@ -114,3 +114,13 @@ module "vault" {
   namespace     = "vault"
   chart_version = "0.15.0"
 }
+
+################################################################################
+# Jenkins Operator
+################################################################################
+
+module "jenkins_operator" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/jenkins-operator"
+  namespace     = "jenkins-operator"
+  chart_version = "0.5.3"
+}
