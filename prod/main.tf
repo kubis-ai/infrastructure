@@ -76,7 +76,7 @@ module "cluster" {
     asg_min_size            = var.worker_group_launch_template.asg_min_size
     asg_max_size            = var.worker_group_launch_template.asg_max_size
     spot_price              = var.worker_group_launch_template.spot_price
-    target_group_arns       = []
+    target_group_arns       = values(module.alb.target_group_arns)
   }]
 }
 
@@ -88,6 +88,8 @@ module "alb" {
   source = "git@github.com:kubis-ai/terraform-modules.git//modules/alb"
   name   = "${var.cluster_name}-alb"
 
+  applications = var.applications
+
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.public_subnets
 
@@ -96,6 +98,45 @@ module "alb" {
   cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
 
   enable_tls = var.enable_tls
+}
+
+################################################################################
+# DNS
+################################################################################
+
+module "dns" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/dns"
+
+  domain             = var.domain
+  create_certificate = var.enable_tls
+  enable_aliasing    = true
+  alias = {
+    dns_name = module.alb.dns_name
+    zone_id  = module.alb.zone_id
+  }
+}
+
+################################################################################
+# cert-manager
+################################################################################
+
+module "cert_manager" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/cert-manager"
+  chart_version = "1.1.1"
+}
+
+################################################################################
+# AWS Load balancer controller
+################################################################################
+
+module "lb_controller" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/lb-controller"
+  chart_version = "2.1.2"
+
+  iam_role_arn = module.alb.iam_role_arn
+  cluster_name = module.cluster.cluster_id
+
+  depends_on = [module.cert_manager]
 }
 
 ################################################################################

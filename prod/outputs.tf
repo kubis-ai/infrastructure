@@ -17,3 +17,8 @@ output "kubeconfig_filename" {
   description = "Kubeconfig filename."
   value       = module.cluster.kubeconfig_filename
 }
+
+output "target_group_arns" {
+  description = "ARN of the target group representing the EKS worker nodes."
+  value       = module.alb.target_group_arns
+}

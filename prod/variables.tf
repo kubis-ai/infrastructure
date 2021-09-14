@@ -3,13 +3,8 @@ variable "aws_region" {
   type        = string
 }
 
-variable "cluster_name" {
-  description = "Kubernetes cluster name."
-  type        = string
-}
-
-variable "kubernetes_version" {
-  description = "Kubernetes version to use for the EKS cluster."
+variable "domain" {
+  description = "Domain name."
   type        = string
 }
 
@@ -36,6 +31,16 @@ variable "public_subnets" {
 # Cluster
 ################################################################################
 
+variable "cluster_name" {
+  description = "Kubernetes cluster name."
+  type        = string
+}
+
+variable "kubernetes_version" {
+  description = "Kubernetes version to use for the EKS cluster."
+  type        = string
+}
+
 variable "worker_group_launch_template" {
   description = "Configuration for worker group one."
   type = object({
@@ -59,6 +64,14 @@ variable "kubeconfig_output_path" {
 ################################################################################
 # Application load balancer
 ################################################################################
+
+variable "applications" {
+  description = "Map of applications and their configuration."
+  type = map(object({
+    node_port = number,
+    protocol  = string
+  }))
+}
 
 variable "enable_tls" {
   description = "Whether to enable secure communication over HTTPS. When enabled, HTTP redirects to HTTPS."
