@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-ROOT_FOLDER="../"
+ROOT_FOLDER="../prod"
 cd $ROOT_FOLDER
 
 echo '[+] Initializing Terraform...'

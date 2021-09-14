@@ -93,19 +93,11 @@ module "alb" {
 }
 
 ################################################################################
-# ArgoCD
+# ArgoCD (argocd-vault-plugin)
 ################################################################################
 
 module "argocd" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/argocd"
-  chart_version = "3.17.5"
-}
-
-################################################################################
-# Sealed Secrets
-################################################################################
-
-module "sealed_secrets" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/sealed-secrets"
-  chart_version = "1.16.0"
+  source    = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/argocd"
+  namespace = "argocd"
+  variant   = "argocd-vault-plugin"
 }
