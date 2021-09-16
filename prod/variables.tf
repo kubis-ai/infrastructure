@@ -41,18 +41,16 @@ variable "kubernetes_version" {
   type        = string
 }
 
-variable "worker_group_launch_template" {
-  description = "Configuration for worker group one."
+variable "spot_workers" {
+  description = "Configuration for spot workers."
   type = object({
-    name                    = string
-    instance_type           = string
-    asg_desired_capacity    = number
-    asg_min_size            = number
-    asg_max_size            = number
-    spot_price              = string
-    override_instance_types = optional(list(string))
-    on_demand_base_capacity = optional(string)
-    target_group_arns       = optional(list(string))
+    name                 = string
+    instance_type        = string
+    asg_desired_capacity = number
+    asg_min_size         = number
+    asg_max_size         = number
+    spot_price           = string
+    kubelet_extra_args   = string
   })
 }
 

@@ -68,15 +68,14 @@ module "cluster" {
   write_kubeconfig       = true
   kubeconfig_output_path = var.kubeconfig_output_path
 
-  worker_groups_launch_template = [{
-    name                    = var.worker_group_launch_template.name
-    instance_type           = var.worker_group_launch_template.instance_type
-    override_instance_types = var.worker_group_launch_template.override_instance_types
-    asg_desired_capacity    = var.worker_group_launch_template.asg_desired_capacity
-    asg_min_size            = var.worker_group_launch_template.asg_min_size
-    asg_max_size            = var.worker_group_launch_template.asg_max_size
-    spot_price              = var.worker_group_launch_template.spot_price
-    target_group_arns       = values(module.alb.target_group_arns)
+  worker_groups = [{
+    name                 = var.spot_workers.name
+    asg_desired_capacity = var.spot_workers.asg_desired_capacity
+    asg_max_size         = var.spot_workers.asg_max_size
+    asg_min_size         = var.spot_workers.asg_min_size
+    instance_type        = var.spot_workers.instance_type
+    spot_price           = var.spot_workers.spot_price
+    target_group_arns    = values(module.alb.target_group_arns)
   }]
 }
 
@@ -140,6 +139,26 @@ module "lb_controller" {
 }
 
 ################################################################################
+# Tekton Pipelines
+################################################################################
+
+module "tekton_pipelines" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-pipelines"
+  chart_version = "0.27.3"
+}
+
+################################################################################
+# Tekton Dashboard
+################################################################################
+
+module "tekton_dashboard" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-dashboard"
+  chart_version = "0.20.0"
+
+  depends_on = [module.tekton_pipelines]
+}
+
+################################################################################
 # ArgoCD (argocd-vault-plugin)
 ################################################################################
 
@@ -161,12 +180,3 @@ module "vault" {
   chart_version = "0.15.0"
 }
 
-################################################################################
-# Jenkins Operator
-################################################################################
-
-module "jenkins_operator" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/jenkins-operator"
-  namespace     = "jenkins-operator"
-  chart_version = "0.5.3"
-}
