@@ -148,6 +148,17 @@ module "tekton_pipelines" {
 }
 
 ################################################################################
+# Tekton Triggers
+################################################################################
+
+module "tekton_triggers" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-triggers"
+  chart_version = "0.16.1"
+
+  depends_on = [module.tekton_pipelines]
+}
+
+################################################################################
 # Tekton Dashboard
 ################################################################################
 
