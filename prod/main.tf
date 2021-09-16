@@ -191,3 +191,16 @@ module "vault" {
   chart_version = "0.15.0"
 }
 
+################################################################################
+# External Secrets
+################################################################################
+
+module "external_secrets" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/external-secrets"
+  chart_version = "8.3.0"
+
+  enable_irsa             = true
+  aws_region              = var.aws_region
+  oidc_provider_arn       = module.cluster.oidc_provider_arn
+  cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
+}
