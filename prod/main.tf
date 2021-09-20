@@ -17,6 +17,14 @@ provider "helm" {
   }
 }
 
+locals {
+  http_node_port        = 32080
+  https_node_port       = 32443
+  health_check_path     = "/healthz"
+  health_check_port     = 10254
+  health_check_protocol = "HTTP"
+}
+
 data "aws_availability_zones" "available" {}
 
 ################################################################################
@@ -65,6 +73,10 @@ module "cluster" {
 
   enable_irsa = true
 
+  allow_traffic_from_nlb = true
+  cidr_blocks            = module.vpc.public_subnets_cidr_blocks
+  node_ports             = [local.http_node_port, local.https_node_port, local.health_check_port]
+
   write_kubeconfig       = true
   kubeconfig_output_path = var.kubeconfig_output_path
 
@@ -75,28 +87,26 @@ module "cluster" {
     asg_min_size         = var.spot_workers.asg_min_size
     instance_type        = var.spot_workers.instance_type
     spot_price           = var.spot_workers.spot_price
-    target_group_arns    = values(module.alb.target_group_arns)
+    target_group_arns    = module.nlb.target_group_arns
   }]
 }
 
 ################################################################################
-# Application load balancer
+# Network Load Balancer
 ################################################################################
 
-module "alb" {
-  source = "git@github.com:kubis-ai/terraform-modules.git//modules/alb"
-  name   = "${var.cluster_name}-alb"
-
-  applications = var.applications
+module "nlb" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/nlb"
+  name   = "${var.cluster_name}-nlb"
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.public_subnets
 
-  enable_irsa             = true
-  oidc_provider_arn       = module.cluster.oidc_provider_arn
-  cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
+  http_node_port = local.http_node_port
 
-  enable_tls = var.enable_tls
+  health_check_path     = local.health_check_path
+  health_check_port     = local.health_check_port
+  health_check_protocol = local.health_check_protocol
 }
 
 ################################################################################
@@ -107,35 +117,32 @@ module "dns" {
   source = "git@github.com:kubis-ai/terraform-modules.git//modules/dns"
 
   domain             = var.domain
+  subdomains         = var.subdomains
   create_certificate = var.enable_tls
   enable_aliasing    = true
   alias = {
-    dns_name = module.alb.dns_name
-    zone_id  = module.alb.zone_id
+    dns_name = module.nlb.dns_name
+    zone_id  = module.nlb.zone_id
   }
 }
 
 ################################################################################
-# cert-manager
+# NGINX Ingress Controller
 ################################################################################
 
-module "cert_manager" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/cert-manager"
-  chart_version = "1.1.1"
-}
+module "ingress_nginx" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/ingress-nginx"
+  chart_version = "4.0.1"
 
-################################################################################
-# AWS Load balancer controller
-################################################################################
+  service_type    = "NodePort"
+  controller_kind = "DaemonSet"
 
-module "lb_controller" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/lb-controller"
-  chart_version = "2.1.2"
+  http_node_port  = local.http_node_port
+  https_node_port = local.https_node_port
 
-  iam_role_arn = module.alb.iam_role_arn
-  cluster_name = module.cluster.cluster_id
-
-  depends_on = [module.cert_manager]
+  health_check_path     = local.health_check_path
+  health_check_port     = local.health_check_port
+  health_check_protocol = local.health_check_protocol
 }
 
 ################################################################################
@@ -145,6 +152,8 @@ module "lb_controller" {
 module "tekton_pipelines" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-pipelines"
   chart_version = "0.27.3"
+
+  depends_on = [module.cluster]
 }
 
 ################################################################################
@@ -155,7 +164,7 @@ module "tekton_triggers" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-triggers"
   chart_version = "0.16.1"
 
-  depends_on = [module.tekton_pipelines]
+  depends_on = [module.cluster, module.tekton_pipelines]
 }
 
 ################################################################################
@@ -166,29 +175,21 @@ module "tekton_dashboard" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-dashboard"
   chart_version = "0.20.0"
 
-  depends_on = [module.tekton_pipelines]
+  depends_on = [module.cluster, module.tekton_pipelines]
 }
 
 ################################################################################
-# ArgoCD (argocd-vault-plugin)
+# ArgoCD
 ################################################################################
 
 module "argocd" {
   source    = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/argocd"
   namespace = "argocd"
 
-  variant       = "argocd-vault-plugin"
-  chart_version = "1.3.1"
-}
+  variant       = "argocd"
+  chart_version = "3.17.5"
 
-################################################################################
-# Vault
-################################################################################
-
-module "vault" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/vault"
-  namespace     = "vault"
-  chart_version = "0.15.0"
+  depends_on = [module.cluster]
 }
 
 ################################################################################

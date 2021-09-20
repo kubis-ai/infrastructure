@@ -8,6 +8,11 @@ variable "domain" {
   type        = string
 }
 
+variable "subdomains" {
+  description = "List of subdomains."
+  type        = list(string)
+}
+
 ################################################################################
 # VPC
 ################################################################################

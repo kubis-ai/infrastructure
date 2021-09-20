@@ -20,5 +20,5 @@ output "kubeconfig_filename" {
 
 output "target_group_arns" {
   description = "ARN of the target group representing the EKS worker nodes."
-  value       = module.alb.target_group_arns
+  value       = module.nlb.target_group_arns
 }
