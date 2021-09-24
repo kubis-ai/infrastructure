@@ -21,7 +21,7 @@ locals {
   http_node_port        = 32080
   https_node_port       = 32443
   health_check_path     = "/healthz"
-  health_check_port     = 10254
+  health_check_port     = 32080
   health_check_protocol = "HTTP"
 }
 
@@ -40,7 +40,7 @@ module "vpc" {
   azs                  = data.aws_availability_zones.available.names
   private_subnets      = var.private_subnets
   public_subnets       = var.public_subnets
-  enable_nat_gateway   = false
+  enable_nat_gateway   = true
   single_nat_gateway   = true
   enable_dns_hostnames = true
 
@@ -69,7 +69,7 @@ module "cluster" {
   kubernetes_version = var.kubernetes_version
 
   vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnets
+  subnet_ids = module.vpc.private_subnets
 
   enable_irsa = true
 
@@ -107,6 +107,9 @@ module "nlb" {
   health_check_path     = local.health_check_path
   health_check_port     = local.health_check_port
   health_check_protocol = local.health_check_protocol
+
+  enable_access_logs      = true
+  access_logs_bucket_name = "nlb-access-logs-kubis-prod"
 }
 
 ################################################################################
@@ -130,19 +133,19 @@ module "dns" {
 # NGINX Ingress Controller
 ################################################################################
 
-module "ingress_nginx" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/ingress-nginx"
-  chart_version = "4.0.1"
+module "nginx_ingress" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/ingress-nginx-nginxcorp"
+  chart_version = "0.10.0"
 
   service_type    = "NodePort"
-  controller_kind = "DaemonSet"
+  controller_kind = "daemonset"
 
   http_node_port  = local.http_node_port
   https_node_port = local.https_node_port
 
-  health_check_path     = local.health_check_path
-  health_check_port     = local.health_check_port
-  health_check_protocol = local.health_check_protocol
+  health_check_path = local.health_check_path
+
+  depends_on = [module.cluster]
 }
 
 ################################################################################
