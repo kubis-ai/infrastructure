@@ -69,12 +69,12 @@ module "cluster" {
   kubernetes_version = var.kubernetes_version
 
   vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids = module.vpc.public_subnets
 
   enable_irsa = true
 
   allow_traffic_from_nlb = true
-  cidr_blocks            = module.vpc.public_subnets_cidr_blocks
+  cidr_blocks            = ["0.0.0.0/0"]
   node_ports             = [local.http_node_port, local.https_node_port, local.health_check_port]
 
   write_kubeconfig       = true
@@ -102,7 +102,9 @@ module "nlb" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.public_subnets
 
-  http_node_port = local.http_node_port
+  http_node_port      = local.http_node_port
+  https_node_port     = local.https_node_port
+  tls_certificate_arn = module.dns.certificate_arn
 
   health_check_path     = local.health_check_path
   health_check_port     = local.health_check_port
@@ -140,9 +142,8 @@ module "nginx_ingress" {
   service_type    = "NodePort"
   controller_kind = "daemonset"
 
-  http_node_port  = local.http_node_port
-  https_node_port = local.https_node_port
-
+  http_node_port    = local.http_node_port
+  https_node_port   = local.https_node_port
   health_check_path = local.health_check_path
 
   depends_on = [module.cluster]
@@ -207,4 +208,15 @@ module "external_secrets" {
   aws_region              = var.aws_region
   oidc_provider_arn       = module.cluster.oidc_provider_arn
   cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
+}
+
+################################################################################
+# cert-manager
+################################################################################
+
+module "cert_manager" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/cert-manager"
+  chart_version = "1.1.1"
+
+  depends_on = [module.cluster]
 }

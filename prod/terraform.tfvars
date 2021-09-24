@@ -46,4 +46,4 @@ kubeconfig_output_path = "./prod.kubeconfig"
 
 applications = {}
 
-enable_tls = false
+enable_tls = true
