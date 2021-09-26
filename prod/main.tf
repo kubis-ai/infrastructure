@@ -92,6 +92,23 @@ module "cluster" {
 }
 
 ################################################################################
+# DNS
+################################################################################
+
+module "dns" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/dns"
+
+  domain             = var.domain
+  subdomains         = var.subdomains
+  create_certificate = var.enable_tls
+  enable_aliasing    = true
+  alias = {
+    dns_name = module.nlb.dns_name
+    zone_id  = module.nlb.zone_id
+  }
+}
+
+################################################################################
 # Network Load Balancer
 ################################################################################
 
@@ -115,20 +132,14 @@ module "nlb" {
 }
 
 ################################################################################
-# DNS
+# cert-manager
 ################################################################################
 
-module "dns" {
-  source = "git@github.com:kubis-ai/terraform-modules.git//modules/dns"
+module "cert_manager" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/cert-manager"
+  chart_version = "1.1.1"
 
-  domain             = var.domain
-  subdomains         = var.subdomains
-  create_certificate = var.enable_tls
-  enable_aliasing    = true
-  alias = {
-    dns_name = module.nlb.dns_name
-    zone_id  = module.nlb.zone_id
-  }
+  depends_on = [module.cluster]
 }
 
 ################################################################################
@@ -146,7 +157,7 @@ module "nginx_ingress" {
   https_node_port   = local.https_node_port
   health_check_path = local.health_check_path
 
-  depends_on = [module.cluster]
+  depends_on = [module.cluster, module.cert_manager]
 }
 
 ################################################################################
@@ -157,7 +168,7 @@ module "tekton_pipelines" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-pipelines"
   chart_version = "0.27.3"
 
-  depends_on = [module.cluster]
+  depends_on = [module.cluster, module.cert_manager]
 }
 
 ################################################################################
@@ -193,7 +204,7 @@ module "argocd" {
   variant       = "argocd"
   chart_version = "3.17.5"
 
-  depends_on = [module.cluster]
+  depends_on = [module.cluster, module.cert_manager]
 }
 
 ################################################################################
@@ -208,15 +219,7 @@ module "external_secrets" {
   aws_region              = var.aws_region
   oidc_provider_arn       = module.cluster.oidc_provider_arn
   cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
+
+  depends_on = [module.cert_manager]
 }
 
-################################################################################
-# cert-manager
-################################################################################
-
-module "cert_manager" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/cert-manager"
-  chart_version = "1.1.1"
-
-  depends_on = [module.cluster]
-}
