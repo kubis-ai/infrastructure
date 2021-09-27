@@ -194,20 +194,6 @@ module "tekton_dashboard" {
 }
 
 ################################################################################
-# ArgoCD
-################################################################################
-
-module "argocd" {
-  source    = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/argocd"
-  namespace = "argocd"
-
-  variant       = "argocd"
-  chart_version = "3.17.5"
-
-  depends_on = [module.cluster, module.cert_manager]
-}
-
-################################################################################
 # External Secrets
 ################################################################################
 
