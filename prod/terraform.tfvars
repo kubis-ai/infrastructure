@@ -1,6 +1,12 @@
 aws_region = "us-east-2"
-domain     = "kubis.ai"
-subdomains = ["*.kubis.ai"]
+
+################################################################################
+# Domains
+################################################################################
+
+domain      = "kubis.ai"
+subdomains  = ["*.kubis.ai"]
+auth_domain = "auth.kubis.ai"
 
 ################################################################################
 # VPC
@@ -41,9 +47,21 @@ spot_workers = {
 kubeconfig_output_path = "./prod.kubeconfig"
 
 ################################################################################
-# Application load balancer
+# DNS
 ################################################################################
 
-applications = {}
-
 enable_tls = true
+
+################################################################################
+# Kratos
+################################################################################
+
+kratos_db_username             = "kratos"
+kratos_db_password_secret_name = "prod/kratos/db-password"
+
+identity_default_schema_filepath = "./config/user.schema.json"
+google_oauth2_mapper_filepath    = "./config/oidc.google.jsonnet"
+
+google_oauth2_client_id          = "468602998216-dqeit9si4d034ehmbovq16hr3c8c0i2m.apps.googleusercontent.com"
+google_oauth2_client_secret_name = "prod/kratos/google-oauth2-client-secret"
+google_oauth2_scope              = "{email, profile}"

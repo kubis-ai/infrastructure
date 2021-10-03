@@ -3,6 +3,10 @@ variable "aws_region" {
   type        = string
 }
 
+################################################################################
+# Domains
+################################################################################
+
 variable "domain" {
   description = "Domain name."
   type        = string
@@ -11,6 +15,11 @@ variable "domain" {
 variable "subdomains" {
   description = "List of subdomains."
   type        = list(string)
+}
+
+variable "auth_domain" {
+  description = "The domain for the auth service used by Kratos."
+  type        = string
 }
 
 ################################################################################
@@ -65,18 +74,50 @@ variable "kubeconfig_output_path" {
 }
 
 ################################################################################
-# Application load balancer
+# DNS
 ################################################################################
-
-variable "applications" {
-  description = "Map of applications and their configuration."
-  type = map(object({
-    node_port = number,
-    protocol  = string
-  }))
-}
 
 variable "enable_tls" {
   description = "Whether to enable secure communication over HTTPS. When enabled, HTTP redirects to HTTPS."
   type        = bool
+}
+
+################################################################################
+# Kratos
+################################################################################
+
+variable "kratos_db_username" {
+  description = "Username for database used by Kratos."
+  type        = string
+}
+
+variable "kratos_db_password_secret_name" {
+  description = "Username for database password used by Kratos."
+  type        = string
+}
+
+variable "identity_default_schema_filepath" {
+  description = "The filepath for the default identity schema."
+  type        = string
+}
+
+
+variable "google_oauth2_client_id" {
+  description = "The client ID registered on Google OAuth2"
+  type        = string
+}
+
+variable "google_oauth2_client_secret_name" {
+  description = "The Google OAuth2 client secret name stored in AWS Secrets Manager."
+  type        = string
+}
+
+variable "google_oauth2_mapper_filepath" {
+  description = "Path to Jsonnet claims mapper to map Google claims to user identity's traits."
+  type        = string
+}
+
+variable "google_oauth2_scope" {
+  description = "List of scopes to be requested, separated by comma. Ex: \"{a, b, c}\""
+  type        = string
 }

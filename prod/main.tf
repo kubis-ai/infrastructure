@@ -132,6 +132,16 @@ module "nlb" {
 }
 
 ################################################################################
+# Email
+################################################################################
+
+module "email" {
+  source     = "git@github.com:kubis-ai/terraform-modules.git//modules/email"
+  domain     = var.domain
+  aws_region = var.aws_region
+}
+
+################################################################################
 # cert-manager
 ################################################################################
 
@@ -147,7 +157,7 @@ module "cert_manager" {
 ################################################################################
 
 module "nginx_ingress" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/ingress-nginx-nginxcorp"
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/nginx-ingress"
   chart_version = "0.10.0"
 
   service_type    = "NodePort"
@@ -209,3 +219,53 @@ module "external_secrets" {
   depends_on = [module.cert_manager]
 }
 
+################################################################################
+# Kratos
+################################################################################
+
+data "aws_secretsmanager_secret" "google_oauth2" {
+  name = var.google_oauth2_client_secret_name
+}
+
+data "aws_secretsmanager_secret_version" "google_oauth2_client_secret" {
+  secret_id = data.aws_secretsmanager_secret.google_oauth2.id
+}
+
+module "kratos_db" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/data-stores/kratos-data-store"
+
+  name                   = "kratosdb"
+  instance_class         = "db.t4g.micro"
+  allocated_storage      = 5
+  password_secret_name   = var.kratos_db_password_secret_name
+  subnet_ids             = module.vpc.private_subnets
+  vpc_security_group_ids = [module.cluster.worker_security_group_id]
+  deletion_protection    = true
+}
+
+module "kratos" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/kratos"
+  chart_version = "0.19.5"
+
+  log_level = "info"
+
+  host = var.auth_domain
+  path = "/"
+
+  default_browser_return_url       = var.domain
+  identity_default_schema_filepath = abspath(var.identity_default_schema_filepath)
+
+  smtp_connection_uri     = "${module.email.smtp_email_send_uri}?skip_ssl_verify=false"
+  database_connection_uri = "${module.kratos_db.connection_uri}?max_conns=20&max_idle_conns=4"
+
+  enable_password = true
+  enable_oidc     = true
+
+  enable_google_oauth2          = true
+  google_oauth2_client_id       = var.google_oauth2_client_id
+  google_oauth2_client_secret   = data.aws_secretsmanager_secret_version.google_oauth2_client_secret.secret_string
+  google_oauth2_mapper_filepath = abspath(var.google_oauth2_mapper_filepath)
+  google_oauth2_scope           = var.google_oauth2_scope
+
+  depends_on = [module.cluster, module.cert_manager]
+}
