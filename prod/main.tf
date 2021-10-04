@@ -240,7 +240,7 @@ module "kratos_db" {
   password_secret_name   = var.kratos_db_password_secret_name
   subnet_ids             = module.vpc.private_subnets
   vpc_security_group_ids = [module.cluster.worker_security_group_id]
-  deletion_protection    = true
+  deletion_protection    = false
 }
 
 module "kratos" {
@@ -255,7 +255,7 @@ module "kratos" {
   default_browser_return_url       = var.domain
   identity_default_schema_filepath = abspath(var.identity_default_schema_filepath)
 
-  smtp_connection_uri     = "${module.email.smtp_email_send_uri}?skip_ssl_verify=false"
+  smtp_connection_uri     = "${module.email.smtp_email_send_uri}/?skip_ssl_verify=false"
   database_connection_uri = "${module.kratos_db.connection_uri}?max_conns=20&max_idle_conns=4"
 
   enable_password = true
