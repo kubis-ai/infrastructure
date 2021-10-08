@@ -1,4 +1,4 @@
-aws_region = "us-east-2"
+default_aws_region = "us-east-2"
 
 ################################################################################
 # Domains
@@ -53,6 +53,19 @@ kubeconfig_output_path = "./prod.kubeconfig"
 enable_tls = true
 
 ################################################################################
+# Email
+################################################################################
+
+email_aws_region = "us-east-1"
+email_identities = ["noreply@kubis.ai"]
+
+################################################################################
+# Authentication
+################################################################################
+
+auth_from_email_address = "Kubis <noreply@kubis.ai>"
+
+################################################################################
 # Kratos
 ################################################################################
 
@@ -63,5 +76,6 @@ identity_default_schema_filepath = "./config/user.schema.json"
 google_oauth2_mapper_filepath    = "./config/oidc.google.jsonnet"
 
 google_oauth2_client_id          = "468602998216-dqeit9si4d034ehmbovq16hr3c8c0i2m.apps.googleusercontent.com"
-google_oauth2_client_secret_name = "prod/kratos/google-oauth2-client-secret"
+google_oauth2_client_id_name     = "/prod/auth/google-oauth2-client-id"
+google_oauth2_client_secret_name = "/prod/auth/google-oauth2-client-secret"
 google_oauth2_scope              = "{email, profile}"

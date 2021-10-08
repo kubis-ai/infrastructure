@@ -8,7 +8,12 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region = var.default_aws_region
+}
+
+provider "aws" {
+  alias  = "email"
+  region = var.email_aws_region
 }
 
 provider "helm" {
@@ -136,9 +141,156 @@ module "nlb" {
 ################################################################################
 
 module "email" {
-  source     = "git@github.com:kubis-ai/terraform-modules.git//modules/email"
-  domain     = var.domain
-  aws_region = var.aws_region
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/email"
+  providers = {
+    aws = aws.email
+  }
+
+  domain           = var.domain
+  email_identities = var.email_identities
+  aws_region       = var.email_aws_region
+}
+
+################################################################################
+# Authentication
+################################################################################
+
+data "aws_ssm_parameter" "google_oauth2_client_secret" {
+  name = var.google_oauth2_client_secret_name
+}
+
+data "aws_ssm_parameter" "google_oauth2_client_id" {
+  name = var.google_oauth2_client_id_name
+}
+
+resource "aws_cognito_user_pool" "users" {
+  name = "users"
+
+  auto_verified_attributes = ["email"]
+
+  alias_attributes = ["email", "phone_number"]
+
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+
+    recovery_mechanism {
+      name     = "verified_phone_number"
+      priority = 2
+    }
+  }
+
+  email_configuration {
+    email_sending_account = "DEVELOPER"
+    source_arn            = module.email.domain_identity_arn
+    from_email_address    = var.auth_from_email_address
+  }
+
+  password_policy {
+    minimum_length                   = 8
+    require_lowercase                = true
+    require_uppercase                = true
+    require_numbers                  = true
+    require_symbols                  = false
+    temporary_password_validity_days = 7
+  }
+
+  username_configuration {
+    case_sensitive = false
+  }
+
+  schema {
+    name                     = "name"
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    required                 = false
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 2048
+    }
+  }
+
+  schema {
+    name                     = "email"
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    required                 = true
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 2048
+    }
+  }
+}
+
+resource "aws_cognito_identity_provider" "google" {
+  user_pool_id  = aws_cognito_user_pool.users.id
+  provider_name = "Google"
+  provider_type = "Google"
+
+  provider_details = {
+    authorize_scopes = "profile email openid"
+    client_id        = data.aws_ssm_parameter.google_oauth2_client_id.value
+    client_secret    = data.aws_ssm_parameter.google_oauth2_client_secret.value
+  }
+
+  attribute_mapping = {
+    email       = "email"
+    family_name = "family_name"
+    given_name  = "given_name"
+    name        = "name"
+    picture     = "picture"
+    username    = "sub"
+  }
+}
+
+resource "aws_cognito_user_pool_client" "website" {
+  name         = "kubis-website"
+  user_pool_id = aws_cognito_user_pool.users.id
+
+  id_token_validity       = "1"
+  access_token_validity   = "1"
+  refresh_token_validity  = "24"
+  enable_token_revocation = true
+
+  token_validity_units {
+    id_token      = "hours"
+    access_token  = "hours"
+    refresh_token = "hours"
+  }
+
+  generate_secret = true
+
+  supported_identity_providers         = [aws_cognito_identity_provider.google.provider_name]
+  allowed_oauth_flows                  = ["code"]
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_scopes = [
+    "aws.cognito.signin.user.admin",
+    "email",
+    "openid",
+    "profile",
+  ]
+  callback_urls = ["http://localhost:3000"]
+  logout_urls   = ["http://localhost:3000"]
+
+  prevent_user_existence_errors = "ENABLED"
+}
+
+resource "aws_ssm_parameter" "cognito_client_id" {
+  name        = "/prod/auth/cognito-website-client-id"
+  description = "The id for the website client giving access to Cognito."
+  type        = "String"
+  value       = aws_cognito_user_pool_client.website.id
+}
+
+resource "aws_ssm_parameter" "cognito_client_secret" {
+  name        = "/prod/auth/cognito-website-client-secret"
+  description = "The secret for the website client giving access to Cognito."
+  type        = "SecureString"
+  value       = aws_cognito_user_pool_client.website.client_secret
 }
 
 ################################################################################
@@ -212,7 +364,7 @@ module "external_secrets" {
   chart_version = "8.3.0"
 
   enable_irsa             = true
-  aws_region              = var.aws_region
+  aws_region              = var.default_aws_region
   oidc_provider_arn       = module.cluster.oidc_provider_arn
   cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
 
@@ -222,14 +374,6 @@ module "external_secrets" {
 ################################################################################
 # Kratos
 ################################################################################
-
-data "aws_secretsmanager_secret" "google_oauth2" {
-  name = var.google_oauth2_client_secret_name
-}
-
-data "aws_secretsmanager_secret_version" "google_oauth2_client_secret" {
-  secret_id = data.aws_secretsmanager_secret.google_oauth2.id
-}
 
 module "kratos_db" {
   source = "git@github.com:kubis-ai/terraform-modules.git//modules/data-stores/kratos-data-store"
@@ -246,11 +390,13 @@ module "kratos_db" {
 module "kratos" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/kratos"
   chart_version = "0.19.5"
+  release_tag   = "v0.7.6-alpha.1"
 
-  log_level = "info"
+  log_level = "debug"
 
-  host = var.auth_domain
-  path = "/"
+  host                 = var.auth_domain
+  path                 = "/"
+  cors_allowed_origins = "{http://localhost:3000}"
 
   default_browser_return_url       = var.domain
   identity_default_schema_filepath = abspath(var.identity_default_schema_filepath)
@@ -262,8 +408,8 @@ module "kratos" {
   enable_oidc     = true
 
   enable_google_oauth2          = true
-  google_oauth2_client_id       = var.google_oauth2_client_id
-  google_oauth2_client_secret   = data.aws_secretsmanager_secret_version.google_oauth2_client_secret.secret_string
+  google_oauth2_client_id       = data.aws_ssm_parameter.google_oauth2_client_id.value
+  google_oauth2_client_secret   = data.aws_ssm_parameter.google_oauth2_client_secret.value
   google_oauth2_mapper_filepath = abspath(var.google_oauth2_mapper_filepath)
   google_oauth2_scope           = var.google_oauth2_scope
 

@@ -1,5 +1,5 @@
-variable "aws_region" {
-  description = "AWS region."
+variable "default_aws_region" {
+  description = "Default AWS region."
   type        = string
 }
 
@@ -83,6 +83,31 @@ variable "enable_tls" {
 }
 
 ################################################################################
+# Email
+################################################################################
+
+// Congnito requires that SES be configured in one of these regions:
+// eu-west-1, us-east-1, us-west-2
+variable "email_aws_region" {
+  description = "AWS region for Amazon Simple Email Service (SES)."
+  type        = string
+}
+
+variable "email_identities" {
+  description = "List of email identities to be registered with SES."
+  type        = list(string)
+}
+
+################################################################################
+# Authentication
+################################################################################
+
+variable "auth_from_email_address" {
+  description = "Sender’s email address or sender’s display name with their email address."
+  type        = string
+}
+
+################################################################################
 # Kratos
 ################################################################################
 
@@ -107,8 +132,13 @@ variable "google_oauth2_client_id" {
   type        = string
 }
 
+variable "google_oauth2_client_id_name" {
+  description = "The Google OAuth2 client id name stored in AWS Parameter Store."
+  type        = string
+}
+
 variable "google_oauth2_client_secret_name" {
-  description = "The Google OAuth2 client secret name stored in AWS Secrets Manager."
+  description = "The Google OAuth2 client secret name stored in AWS Parameter Store."
   type        = string
 }
 

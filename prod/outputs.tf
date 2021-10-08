@@ -1,6 +1,6 @@
-output "aws_region" {
-  description = "AWS region."
-  value       = var.aws_region
+output "default_aws_region" {
+  description = "Default AWS region."
+  value       = var.default_aws_region
 }
 
 output "cluster_name" {
