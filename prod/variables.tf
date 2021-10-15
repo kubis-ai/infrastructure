@@ -107,6 +107,16 @@ variable "auth_from_email_address" {
   type        = string
 }
 
+variable "cognito_client_id_name" {
+  description = "The name for exporting the cognito client id to the AWS Parameter Store."
+  type        = string
+}
+
+variable "cognito_user_pool_id_name" {
+  description = "The name for exporting the cognito user pool id to the AWS Parameter Store."
+  type        = string
+}
+
 ################################################################################
 # Kratos
 ################################################################################

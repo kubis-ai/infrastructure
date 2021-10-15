@@ -57,13 +57,17 @@ enable_tls = true
 ################################################################################
 
 email_aws_region = "us-east-1"
-email_identities = ["noreply@kubis.ai"]
+email_identities = ["noreply@kubis.ai", "mdc.nathalia@gmail.com"]
 
 ################################################################################
 # Authentication
 ################################################################################
 
-auth_from_email_address = "Kubis <noreply@kubis.ai>"
+auth_from_email_address          = "Kubis <noreply@kubis.ai>"
+cognito_client_id_name           = "/prod/auth/cognito-website-client-id"
+cognito_user_pool_id_name        = "/prod/auth/cognito-user-pool-id"
+google_oauth2_client_id_name     = "/prod/auth/google-oauth2-client-id"
+google_oauth2_client_secret_name = "/prod/auth/google-oauth2-client-secret"
 
 ################################################################################
 # Kratos
@@ -75,7 +79,6 @@ kratos_db_password_secret_name = "prod/kratos/db-password"
 identity_default_schema_filepath = "./config/user.schema.json"
 google_oauth2_mapper_filepath    = "./config/oidc.google.jsonnet"
 
-google_oauth2_client_id          = "468602998216-dqeit9si4d034ehmbovq16hr3c8c0i2m.apps.googleusercontent.com"
-google_oauth2_client_id_name     = "/prod/auth/google-oauth2-client-id"
-google_oauth2_client_secret_name = "/prod/auth/google-oauth2-client-secret"
-google_oauth2_scope              = "{email, profile}"
+google_oauth2_client_id = "468602998216-dqeit9si4d034ehmbovq16hr3c8c0i2m.apps.googleusercontent.com"
+
+google_oauth2_scope = "{email, profile}"
