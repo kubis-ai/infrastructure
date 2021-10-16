@@ -17,7 +17,7 @@ def lambda_handler(event, context):
 
     print(event)
 
-    if event['triggerSource'] == "CustomMessage_SignUp" or "CustomMessage_ResendCode":
+    if event['triggerSource'] == "CustomMessage_SignUp" or event['triggerSource'] == "CustomMessage_ResendCode":
         url = domain + accountValidationEndpoint + "?email=" + username + "&code=" + code
         event['response']['emailSubject'] = "Validate your account"
         event['response']['emailMessage'] = "Hi " + name + "!<br><br>" \\
