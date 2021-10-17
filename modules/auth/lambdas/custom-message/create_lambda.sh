@@ -33,7 +33,7 @@ def lambda_handler(event, context):
         url = domain + passwordResetConfirmationEndpoint + "?email=" + username + "&code=" + code
         event['response']['emailSubject'] = "Reset your password"
         event['response']['emailMessage'] = "Hi " + name + "!<br><br>" \\
-                                            "Please click the link below to reset your password:<br><br>" \\
+                                            "Please click the link below to define a new password:<br><br>" \\
                                             "<a href='" + url + "'>" + url + "</a><br><br>" \\
 
     elif event['triggerSource'] == "CustomMessage_UpdateUserAttribute":
