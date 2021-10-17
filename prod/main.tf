@@ -174,8 +174,9 @@ module "auth" {
   access_token_validity  = "1"
   refresh_token_validity = "24"
 
-  domain                      = var.domain
-  account_validation_endpoint = "/account-verification"
+  domain                               = var.domain
+  account_validation_endpoint          = "/account-verification"
+  password_reset_confirmation_endpoint = "/reset-password"
 }
 
 ################################################################################

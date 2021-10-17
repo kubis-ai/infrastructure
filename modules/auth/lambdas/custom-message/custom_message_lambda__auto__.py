@@ -2,6 +2,7 @@ def lambda_handler(event, context):
 
     domain = 'https://kubis.ai'
     accountValidationEndpoint = '/account-verification'
+    passwordResetConfirmationEndpoint = '/reset-password'
 
     username = event.get('userName', '')
     name = event['request']['userAttributes'].get('name', '')
@@ -9,7 +10,7 @@ def lambda_handler(event, context):
 
     print(event)
 
-    if event['triggerSource'] == "CustomMessage_SignUp" or "CustomMessage_ResendCode":
+    if event['triggerSource'] == "CustomMessage_SignUp" or event['triggerSource'] == "CustomMessage_ResendCode":
         url = domain + accountValidationEndpoint + "?email=" + username + "&code=" + code
         event['response']['emailSubject'] = "Validate your account"
         event['response']['emailMessage'] = "Hi " + name + "!<br><br>" \
@@ -21,11 +22,11 @@ def lambda_handler(event, context):
                                             "Kubis Team" 
 
     elif event['triggerSource'] == "CustomMessage_ForgotPassword":
+        url = domain + passwordResetConfirmationEndpoint + "?email=" + username + "&code=" + code
         event['response']['emailSubject'] = "Reset your password"
-        event['response']['emailMessage'] = "Hi <b>" + username + "</b>!<br>" \
-                                            "Click <a href='" + domain + "confirm-password-reset?" \
-                                            "identifier=" + username + "&code=" + code + "'>here</a> " \
-                                            "to reset your password."
+        event['response']['emailMessage'] = "Hi " + name + "!<br><br>" \
+                                            "Please click the link below to reset your password:<br><br>" \
+                                            "<a href='" + url + "'>" + url + "</a><br><br>" \
 
     elif event['triggerSource'] == "CustomMessage_UpdateUserAttribute":
         event['response']['emailSubject'] = "Validate your new email"

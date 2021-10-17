@@ -161,10 +161,11 @@ resource "null_resource" "create_custom_message_lambda" {
     command = templatefile(
       "${path.module}/lambdas/custom-message/create_lambda.sh",
       {
-        LAMBDA_FOLDER               = "${abspath(path.module)}/lambdas/custom-message"
-        LAMBDA_FILENAME             = "${local.custom_message_lambda_name}.py"
-        DOMAIN                      = "https://${var.domain}"
-        ACCOUNT_VALIDATION_ENDPOINT = var.account_validation_endpoint,
+        LAMBDA_FOLDER                        = "${abspath(path.module)}/lambdas/custom-message"
+        LAMBDA_FILENAME                      = "${local.custom_message_lambda_name}.py"
+        DOMAIN                               = "https://${var.domain}"
+        ACCOUNT_VALIDATION_ENDPOINT          = var.account_validation_endpoint,
+        PASSWORD_RESET_CONFIRMATION_ENDPOINT = var.password_reset_confirmation_endpoint,
       }
     )
   }

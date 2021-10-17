@@ -71,3 +71,8 @@ variable "account_validation_endpoint" {
   description = "The account validation endpoint. Users will be redirected to this page to confirm their emails"
   type        = string
 }
+
+variable "password_reset_confirmation_endpoint" {
+  description = "The password reset confirmation endpoint. Users will be redirected to this page to create a new password."
+  type        = string
+}
