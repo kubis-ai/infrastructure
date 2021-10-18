@@ -176,7 +176,7 @@ module "auth" {
 
   domain                               = var.domain
   account_validation_endpoint          = "/account-verification"
-  password_reset_confirmation_endpoint = "/reset-password"
+  password_reset_confirmation_endpoint = "/redefine-password"
 }
 
 ################################################################################

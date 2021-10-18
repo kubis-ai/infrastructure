@@ -57,7 +57,7 @@ enable_tls = true
 ################################################################################
 
 email_aws_region = "us-east-1"
-email_identities = ["noreply@kubis.ai", "mdc.nathalia@gmail.com"]
+email_identities = ["noreply@kubis.ai", "mdc.nathalia@gmail.com", "tanel.sarnet@gmail.com"]
 
 ################################################################################
 # Authentication

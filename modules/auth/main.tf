@@ -235,7 +235,7 @@ resource "aws_cognito_user_pool_client" "website" {
   // JavaScript SDK doesn't support apps that have a client secret.
   generate_secret = false
 
-  supported_identity_providers         = [aws_cognito_identity_provider.google.provider_name]
+  supported_identity_providers         = ["COGNITO", aws_cognito_identity_provider.google.provider_name]
   allowed_oauth_flows                  = ["code"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes = [

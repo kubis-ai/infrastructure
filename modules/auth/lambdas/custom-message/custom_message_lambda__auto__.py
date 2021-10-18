@@ -2,7 +2,7 @@ def lambda_handler(event, context):
 
     domain = 'https://kubis.ai'
     accountValidationEndpoint = '/account-verification'
-    passwordResetConfirmationEndpoint = '/reset-password'
+    passwordResetConfirmationEndpoint = '/redefine-password'
 
     username = event.get('userName', '')
     name = event['request']['userAttributes'].get('name', '')
