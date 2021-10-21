@@ -119,3 +119,22 @@ variable "google_oauth2_client_secret_path" {
   description = "The Google OAuth2 client secret name stored in AWS Parameter Store."
   type        = string
 }
+
+################################################################################
+# Container registry
+################################################################################
+
+variable "repository_list" {
+  description = "List of repositories to be created"
+  type        = list(string)
+  default     = []
+}
+
+################################################################################
+# CI/CD
+################################################################################
+
+variable "cicd_domain" {
+  description = "Domain used for CI/CD."
+  type        = string
+}

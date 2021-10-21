@@ -6,7 +6,7 @@ This module constains the definitions for all infrastructure used in Kubis.
 
 The infrastructure must be provisioned in two steps.
 
-1. Create the remote backend for Terraform. This creates an S3 bucket where Terraform stores the state and a DynamoDB table where Terraform stores the lock. Once created, the parameters of this backend must be copied to `backend-prod.hcl`.
+1. Create the remote backend for Terraform. This creates an S3 bucket where Terraform stores the state and a DynamoDB table where Terraform stores the lock. Once created, the parameters of this backend must be copied to `backend.hcl`.
 
 ```
 cd global
@@ -27,7 +27,7 @@ Then migrate the state to the remote backend by running the following command:
 
 ```
 cd global
-terraform init -migrate-state
+terraform init -migrate-state -backend-config=../backend.hcl
 ```
 
 3.  Now the remaining infrastucture can be provisioned by running `hack/create-cluster.sh`. This script will bring up the whole production infrastructure and register the cluster with `kubectl`.
@@ -48,17 +48,16 @@ cd hack
 sh destroy-cluster.sh
 ```
 
-2. In order to destroy the infrastructure associated with the remote backend (S3 buckets and DynamoDB tables), we must first switch to a local backend.Open the file `global/main.tf` and comment out the `terraform` configuration block. Reinitialize terraform with
+2. In order to destroy the infrastructure associated with the remote backend (S3 buckets and DynamoDB tables), we must first switch to a local backend. Open the file `global/main.tf` and comment out the `terraform` configuration block. Reinitialize terraform with
 
 ```
 cd global
 terraform init -migrate-state
 ```
 
-3. Destroy the backend infrastructure.
+and then destroy the backend infrastructure (you might first have to set `force_destroy = true` in `terraform.tfvars`):
 
 ```
-cd global
 terraform destroy
 ```
 

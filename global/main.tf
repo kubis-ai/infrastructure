@@ -1,8 +1,8 @@
-# terraform {
-#   backend "s3" {
-#     key = "global/terraform.tfstate"
-#   }
-# }
+terraform {
+  backend "s3" {
+    key = "global/terraform.tfstate"
+  }
+}
 
 provider "aws" {
   region = var.aws_region

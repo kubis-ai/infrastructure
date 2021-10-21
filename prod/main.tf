@@ -101,11 +101,24 @@ module "dns" {
   domain             = var.domain
   subdomains         = var.subdomains
   create_certificate = var.enable_tls
-  enable_aliasing    = true
-  alias = {
-    dns_name = module.nlb.dns_name
-    zone_id  = module.nlb.zone_id
-  }
+
+  alias = [
+    {
+      source  = var.domain,
+      target  = module.nlb.dns_name
+      zone_id = module.nlb.zone_id
+    },
+    {
+      source  = var.cicd_domain
+      target  = module.nlb.dns_name
+      zone_id = module.nlb.zone_id
+    },
+    {
+      source  = var.auth_domain,
+      target  = module.auth.cloudfront_distribution_arn,
+      zone_id = "Z2FDTNDATAQYW2" # This zone_id is fixed for cloudfront
+    }
+  ]
 }
 
 ################################################################################
@@ -136,6 +149,8 @@ module "nlb" {
 ################################################################################
 
 module "email" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/email"
+
   domain           = var.domain
   email_identities = var.email_identities
   aws_region       = var.aws_region
@@ -167,9 +182,21 @@ module "auth" {
   access_token_validity  = "1"
   refresh_token_validity = "24"
 
-  # Domain for UI hosted by Amazon Cognito. Used in social signins
-  # custom_domain          = var.auth_domain
-  # domain_certificate_arn = module.dns.certificate_arn
+  # Domain for UI hosted by Amazon Cognito. Used for social identity providers
+  custom_domain          = var.auth_domain
+  domain_certificate_arn = module.dns.certificate_arn
+}
+
+################################################################################
+# Container registry
+################################################################################
+
+module "container_registry" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/container-registry"
+
+  repository_list      = var.repository_list
+  image_tag_mutability = "IMMUTABLE"
+  enable_scan_on_push  = true
 }
 
 ################################################################################
@@ -208,6 +235,10 @@ module "nginx_ingress" {
 module "tekton_pipelines" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-pipelines"
   chart_version = "0.27.3"
+
+  create_iam_user            = true
+  aws_access_key_id_path     = "/prod/tekton/aws-access-key-id"
+  aws_access_key_secret_path = "/prod/tekton/aws-access-key-secret"
 
   depends_on = [module.cluster, module.cert_manager]
 }
@@ -249,3 +280,4 @@ module "external_secrets" {
 
   depends_on = [module.cert_manager]
 }
+

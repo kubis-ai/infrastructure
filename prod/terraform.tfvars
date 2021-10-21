@@ -72,3 +72,16 @@ cognito_client_id_path           = "/prod/auth/cognito-website-client-id"
 cognito_user_pool_id_path        = "/prod/auth/cognito-user-pool-id"
 google_oauth2_client_id_path     = "/prod/auth/google-oauth2-client-id"
 google_oauth2_client_secret_path = "/prod/auth/google-oauth2-client-secret"
+
+################################################################################
+# Container registry
+################################################################################
+
+repository_list = ["website"]
+
+################################################################################
+# CI/CD
+################################################################################
+
+cicd_domain = "cicd.kubis.ai"
+
