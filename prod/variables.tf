@@ -110,6 +110,12 @@ variable "cognito_user_pool_id_path" {
   type        = string
 }
 
+
+variable "cognito_custom_domain_path" {
+  description = "The custom domain used for UIs hosted by Amazon Cognito. Used for social identity."
+  type        = string
+}
+
 variable "google_oauth2_client_id_path" {
   description = "The Google OAuth2 client id name stored in AWS Parameter Store."
   type        = string
