@@ -1,5 +1,5 @@
-variable "default_aws_region" {
-  description = "Default AWS region."
+variable "aws_region" {
+  description = "AWS region."
   type        = string
 }
 
@@ -15,11 +15,6 @@ variable "domain" {
 variable "subdomains" {
   description = "List of subdomains."
   type        = list(string)
-}
-
-variable "auth_domain" {
-  description = "The domain for the auth service used by Kratos."
-  type        = string
 }
 
 ################################################################################
@@ -86,13 +81,6 @@ variable "enable_tls" {
 # Email
 ################################################################################
 
-// Congnito requires that SES be configured in one of these regions:
-// eu-west-1, us-east-1, us-west-2
-variable "email_aws_region" {
-  description = "AWS region for Amazon Simple Email Service (SES)."
-  type        = string
-}
-
 variable "email_identities" {
   description = "List of email identities to be registered with SES."
   type        = list(string)
@@ -102,62 +90,32 @@ variable "email_identities" {
 # Authentication
 ################################################################################
 
+variable "auth_domain" {
+  description = "The domain for the auth service."
+  type        = string
+}
+
 variable "auth_from_email_address" {
   description = "Sender’s email address or sender’s display name with their email address."
   type        = string
 }
 
-variable "cognito_client_id_name" {
+variable "cognito_client_id_path" {
   description = "The name for exporting the cognito client id to the AWS Parameter Store."
   type        = string
 }
 
-variable "cognito_user_pool_id_name" {
+variable "cognito_user_pool_id_path" {
   description = "The name for exporting the cognito user pool id to the AWS Parameter Store."
   type        = string
 }
 
-################################################################################
-# Kratos
-################################################################################
-
-variable "kratos_db_username" {
-  description = "Username for database used by Kratos."
-  type        = string
-}
-
-variable "kratos_db_password_secret_name" {
-  description = "Username for database password used by Kratos."
-  type        = string
-}
-
-variable "identity_default_schema_filepath" {
-  description = "The filepath for the default identity schema."
-  type        = string
-}
-
-
-variable "google_oauth2_client_id" {
-  description = "The client ID registered on Google OAuth2"
-  type        = string
-}
-
-variable "google_oauth2_client_id_name" {
+variable "google_oauth2_client_id_path" {
   description = "The Google OAuth2 client id name stored in AWS Parameter Store."
   type        = string
 }
 
-variable "google_oauth2_client_secret_name" {
+variable "google_oauth2_client_secret_path" {
   description = "The Google OAuth2 client secret name stored in AWS Parameter Store."
-  type        = string
-}
-
-variable "google_oauth2_mapper_filepath" {
-  description = "Path to Jsonnet claims mapper to map Google claims to user identity's traits."
-  type        = string
-}
-
-variable "google_oauth2_scope" {
-  description = "List of scopes to be requested, separated by comma. Ex: \"{a, b, c}\""
   type        = string
 }

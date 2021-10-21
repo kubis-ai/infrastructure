@@ -1,12 +1,16 @@
-default_aws_region = "us-east-2"
+# us-east-1 was chosen because:
+# (a) cloudfront certicates used to register custom domains in
+# cognito can only be created in us-east-1
+# (b) Cognito requires that SES be configured in one of these regions:
+# eu-west-1, us-east-1, us-west-2
+aws_region = "us-east-1"
 
 ################################################################################
 # Domains
 ################################################################################
 
-domain      = "kubis.ai"
-subdomains  = ["*.kubis.ai"]
-auth_domain = "auth.kubis.ai"
+domain     = "kubis.ai"
+subdomains = ["*.kubis.ai"]
 
 ################################################################################
 # VPC
@@ -56,29 +60,15 @@ enable_tls = true
 # Email
 ################################################################################
 
-email_aws_region = "us-east-1"
 email_identities = ["noreply@kubis.ai", "mdc.nathalia@gmail.com", "tanel.sarnet@gmail.com"]
 
 ################################################################################
 # Authentication
 ################################################################################
 
+auth_domain                      = "auth.kubis.ai"
 auth_from_email_address          = "Kubis <noreply@kubis.ai>"
-cognito_client_id_name           = "/prod/auth/cognito-website-client-id"
-cognito_user_pool_id_name        = "/prod/auth/cognito-user-pool-id"
-google_oauth2_client_id_name     = "/prod/auth/google-oauth2-client-id"
-google_oauth2_client_secret_name = "/prod/auth/google-oauth2-client-secret"
-
-################################################################################
-# Kratos
-################################################################################
-
-kratos_db_username             = "kratos"
-kratos_db_password_secret_name = "prod/kratos/db-password"
-
-identity_default_schema_filepath = "./config/user.schema.json"
-google_oauth2_mapper_filepath    = "./config/oidc.google.jsonnet"
-
-google_oauth2_client_id = "468602998216-dqeit9si4d034ehmbovq16hr3c8c0i2m.apps.googleusercontent.com"
-
-google_oauth2_scope = "{email, profile}"
+cognito_client_id_path           = "/prod/auth/cognito-website-client-id"
+cognito_user_pool_id_path        = "/prod/auth/cognito-user-pool-id"
+google_oauth2_client_id_path     = "/prod/auth/google-oauth2-client-id"
+google_oauth2_client_secret_path = "/prod/auth/google-oauth2-client-secret"

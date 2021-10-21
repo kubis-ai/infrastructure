@@ -8,12 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  region = var.default_aws_region
-}
-
-provider "aws" {
-  alias  = "email"
-  region = var.email_aws_region
+  region = var.aws_region
 }
 
 provider "helm" {
@@ -23,12 +18,11 @@ provider "helm" {
 }
 
 locals {
-  http_node_port                 = 32080
-  https_node_port                = 32443
-  health_check_path              = "/healthz"
-  health_check_port              = 32080
-  health_check_protocol          = "HTTP"
-  custom_message_lambda_filename = "custom-message-lambda.auto.zip"
+  http_node_port        = 32080
+  https_node_port       = 32443
+  health_check_path     = "/healthz"
+  health_check_port     = 32080
+  health_check_protocol = "HTTP"
 }
 
 data "aws_availability_zones" "available" {}
@@ -142,14 +136,9 @@ module "nlb" {
 ################################################################################
 
 module "email" {
-  source = "git@github.com:kubis-ai/terraform-modules.git//modules/email"
-  providers = {
-    aws = aws.email
-  }
-
   domain           = var.domain
   email_identities = var.email_identities
-  aws_region       = var.email_aws_region
+  aws_region       = var.aws_region
 }
 
 ################################################################################
@@ -157,26 +146,30 @@ module "email" {
 ################################################################################
 
 module "auth" {
-  source = "../modules/auth"
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/auth"
 
   # Secrets and parameters
-  cognito_client_id_name           = var.cognito_client_id_name
-  cognito_user_pool_id_name        = var.cognito_user_pool_id_name
-  google_oauth2_client_id_name     = var.google_oauth2_client_id_name
-  google_oauth2_client_secret_name = var.google_oauth2_client_secret_name
+  cognito_client_id_path           = var.cognito_client_id_path
+  cognito_user_pool_id_path        = var.cognito_user_pool_id_path
+  google_oauth2_client_id_path     = var.google_oauth2_client_id_path
+  google_oauth2_client_secret_path = var.google_oauth2_client_secret_path
 
   # Email
   from_email_address      = var.auth_from_email_address
   ses_domain_identity_arn = module.email.domain_identity_arn
+
+  # Endpoints used in automatic emails
+  account_validation_endpoint          = "https://${var.domain}/account-verification"
+  password_reset_confirmation_endpoint = "https://${var.domain}/redefine-password"
 
   # Tokens
   id_token_validity      = "1"
   access_token_validity  = "1"
   refresh_token_validity = "24"
 
-  domain                               = var.domain
-  account_validation_endpoint          = "/account-verification"
-  password_reset_confirmation_endpoint = "/redefine-password"
+  # Domain for UI hosted by Amazon Cognito. Used in social signins
+  # custom_domain          = var.auth_domain
+  # domain_certificate_arn = module.dns.certificate_arn
 }
 
 ################################################################################
@@ -250,54 +243,9 @@ module "external_secrets" {
   chart_version = "8.3.0"
 
   enable_irsa             = true
-  aws_region              = var.default_aws_region
+  aws_region              = var.aws_region
   oidc_provider_arn       = module.cluster.oidc_provider_arn
   cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
 
   depends_on = [module.cert_manager]
 }
-
-################################################################################
-# Kratos
-################################################################################
-
-# module "kratos_db" {
-#   source = "git@github.com:kubis-ai/terraform-modules.git//modules/data-stores/kratos-data-store"
-
-#   name                   = "kratosdb"
-#   instance_class         = "db.t4g.micro"
-#   allocated_storage      = 5
-#   password_secret_name   = var.kratos_db_password_secret_name
-#   subnet_ids             = module.vpc.private_subnets
-#   vpc_security_group_ids = [module.cluster.worker_security_group_id]
-#   deletion_protection    = false
-# }
-
-# module "kratos" {
-#   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/kratos"
-#   chart_version = "0.19.5"
-#   release_tag   = "v0.7.6-alpha.1"
-
-#   log_level = "debug"
-
-#   host                 = var.auth_domain
-#   path                 = "/"
-#   cors_allowed_origins = "{http://localhost:3000}"
-
-#   default_browser_return_url       = var.domain
-#   identity_default_schema_filepath = abspath(var.identity_default_schema_filepath)
-
-#   smtp_connection_uri     = "${module.email.smtp_email_send_uri}/?skip_ssl_verify=false"
-#   database_connection_uri = "${module.kratos_db.connection_uri}?max_conns=20&max_idle_conns=4"
-
-#   enable_password = true
-#   enable_oidc     = true
-
-#   enable_google_oauth2          = true
-#   google_oauth2_client_id       = data.aws_ssm_parameter.google_oauth2_client_id.value
-#   google_oauth2_client_secret   = data.aws_ssm_parameter.google_oauth2_client_secret.value
-#   google_oauth2_mapper_filepath = abspath(var.google_oauth2_mapper_filepath)
-#   google_oauth2_scope           = var.google_oauth2_scope
-
-#   depends_on = [module.cluster, module.cert_manager]
-# }
