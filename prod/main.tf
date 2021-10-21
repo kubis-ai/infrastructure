@@ -175,8 +175,8 @@ module "auth" {
   ses_domain_identity_arn = module.email.domain_identity_arn
 
   # Endpoints used in automatic emails
-  account_validation_endpoint          = "https://${var.domain}/account-verification"
-  password_reset_confirmation_endpoint = "https://${var.domain}/redefine-password"
+  account_validation_endpoint          = "https://${var.domain}/auth/account-verification"
+  password_reset_confirmation_endpoint = "https://${var.domain}/auth/redefine-password"
 
   # Tokens
   id_token_validity      = "1"
