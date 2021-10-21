@@ -165,6 +165,7 @@ module "auth" {
 
   # Secrets and parameters
   cognito_client_id_path           = var.cognito_client_id_path
+  cognito_client_secret_path       = var.cognito_client_secret_path
   cognito_user_pool_id_path        = var.cognito_user_pool_id_path
   cognito_custom_domain_path       = var.cognito_custom_domain_path
   google_oauth2_client_id_path     = var.google_oauth2_client_id_path
@@ -177,6 +178,10 @@ module "auth" {
   # Endpoints used in automatic emails
   account_validation_endpoint          = "https://${var.domain}/auth/account-verification"
   password_reset_confirmation_endpoint = "https://${var.domain}/auth/redefine-password"
+  callback_urls = [
+    "https://${var.domain}/auth/google",
+    "http://localhost:3000/auth/google"
+  ]
 
   # Tokens
   id_token_validity      = "1"

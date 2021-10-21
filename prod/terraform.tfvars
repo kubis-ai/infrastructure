@@ -69,6 +69,7 @@ email_identities = ["noreply@kubis.ai", "mdc.nathalia@gmail.com", "tanel.sarnet@
 auth_domain                      = "auth.kubis.ai"
 auth_from_email_address          = "Kubis <noreply@kubis.ai>"
 cognito_client_id_path           = "/prod/auth/cognito-website-client-id"
+cognito_client_secret_path       = "/prod/auth/cognito-website-client-secret"
 cognito_user_pool_id_path        = "/prod/auth/cognito-user-pool-id"
 cognito_custom_domain_path       = "/prod/auth/cognito-custom-domain"
 google_oauth2_client_id_path     = "/prod/auth/google-oauth2-client-id"

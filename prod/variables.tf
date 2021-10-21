@@ -105,6 +105,11 @@ variable "cognito_client_id_path" {
   type        = string
 }
 
+variable "cognito_client_secret_path" {
+  description = "The name for exporting the cognito client secret to the AWS Parameter Store."
+  type        = string
+}
+
 variable "cognito_user_pool_id_path" {
   description = "The name for exporting the cognito user pool id to the AWS Parameter Store."
   type        = string
