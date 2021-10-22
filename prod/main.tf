@@ -164,8 +164,8 @@ module "auth" {
   source = "git@github.com:kubis-ai/terraform-modules.git//modules/auth"
 
   # Secrets and parameters
+  generate_client_secret           = false
   cognito_client_id_path           = var.cognito_client_id_path
-  cognito_client_secret_path       = var.cognito_client_secret_path
   cognito_user_pool_id_path        = var.cognito_user_pool_id_path
   cognito_custom_domain_path       = var.cognito_custom_domain_path
   google_oauth2_client_id_path     = var.google_oauth2_client_id_path
