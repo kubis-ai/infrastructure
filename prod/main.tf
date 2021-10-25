@@ -114,11 +114,11 @@ module "dns" {
       target  = module.nlb.dns_name
       zone_id = module.nlb.zone_id
     },
-    {
-      source  = var.auth_domain,
-      target  = module.auth.cloudfront_distribution_arn,
-      zone_id = "Z2FDTNDATAQYW2" # This zone_id is fixed for cloudfront
-    }
+    # {
+    #   source  = var.auth_domain,
+    #   target  = module.auth.cloudfront_distribution_arn,
+    #   zone_id = "Z2FDTNDATAQYW2" # This zone_id is fixed for cloudfront
+    # }
   ]
 }
 
@@ -161,50 +161,51 @@ module "email" {
 # Authentication
 ################################################################################
 
-module "auth" {
-  source = "git@github.com:kubis-ai/terraform-modules.git//modules/auth"
+# module "auth" {
+#   source = "git@github.com:kubis-ai/terraform-modules.git//modules/auth"
 
-  # Secrets and parameters
-  generate_client_secret           = false
-  cognito_client_id_path           = var.cognito_client_id_path
-  cognito_user_pool_id_path        = var.cognito_user_pool_id_path
-  cognito_custom_domain_path       = var.cognito_custom_domain_path
-  google_oauth2_client_id_path     = var.google_oauth2_client_id_path
-  google_oauth2_client_secret_path = var.google_oauth2_client_secret_path
+#   # Secrets and parameters
+#   generate_client_secret           = false
+#   cognito_client_id_path           = var.cognito_client_id_path
+#   cognito_user_pool_id_path        = var.cognito_user_pool_id_path
+#   cognito_custom_domain_path       = var.cognito_custom_domain_path
+#   google_oauth2_client_id_path     = var.google_oauth2_client_id_path
+#   google_oauth2_client_secret_path = var.google_oauth2_client_secret_path
 
-  # Email
-  from_email_address      = var.auth_from_email_address
-  ses_domain_identity_arn = module.email.domain_identity_arn
+#   # Email
+#   from_email_address      = var.auth_from_email_address
+#   ses_domain_identity_arn = module.email.domain_identity_arn
 
-  # Endpoints used in automatic emails
-  account_validation_endpoint          = "https://${var.domain}/auth/account-verification"
-  password_reset_confirmation_endpoint = "https://${var.domain}/auth/redefine-password"
-  callback_urls = [
-    "https://${var.domain}/auth/callback",
-    "http://${local.local_domain}/auth/callback"
-  ]
-  logout_urls = [
-    "https://${var.domain}",
-    "http://${local.local_domain}"
-  ]
+#   # Endpoints used in automatic emails
+#   account_validation_endpoint          = "https://${var.domain}/auth/account-verification"
+#   password_reset_confirmation_endpoint = "https://${var.domain}/auth/redefine-password"
+#   callback_urls = [
+#     "https://${var.domain}/auth/callback",
+#     "http://${local.local_domain}/auth/callback"
+#   ]
+#   logout_urls = [
+#     "https://${var.domain}",
+#     "http://${local.local_domain}"
+#   ]
 
-  # Tokens
-  id_token_validity      = "1"
-  access_token_validity  = "1"
-  refresh_token_validity = "24"
+#   # Tokens
+#   id_token_validity      = "1"
+#   access_token_validity  = "1"
+#   refresh_token_validity = "24"
 
-  # Domain for UI hosted by Amazon Cognito. Used for social identity providers
-  # If the domain is deleted, we need to wait some time for recreating it again.
-  # Otherwise, AWS complains that the domain is already in use.
-  custom_domain          = var.auth_domain
-  domain_certificate_arn = module.dns.certificate_arn
-}
+#   # Domain for UI hosted by Amazon Cognito. Used for social identity providers
+#   # If the domain is deleted, we need to wait some time for recreating it again.
+#   # Otherwise, AWS complains that the domain is already in use.
+#   custom_domain          = var.auth_domain
+#   domain_certificate_arn = module.dns.certificate_arn
+# }
 
 ################################################################################
 # Authentication - Firebase
 ################################################################################
 
 // Records needed for using custom domain in e-mails sent by Firebase
+// and for custom domain hosting using in OAuth flows
 data "aws_route53_zone" "kubis" {
   name = var.domain
 }
@@ -235,9 +236,20 @@ resource "aws_route53_record" "firebase_txt" {
 
   records = [
     "v=spf1 include:_spf.firebasemail.com ~all",
-    "firebase=aerial-ceremony-330017"
+    "firebase=aerial-ceremony-330017",
+    "google-site-verification=9QIbZRfgIYgDTW_KPR73dxSVTFYOxJrS__oduUlG6Pg"
   ]
 }
+
+resource "aws_route53_record" "firebase_auth_domain" {
+  zone_id = data.aws_route53_zone.kubis.zone_id
+  name    = var.auth_domain
+  type    = "A"
+  ttl     = "5"
+
+  records = ["199.36.158.100"]
+}
+
 
 ################################################################################
 # Container registry
