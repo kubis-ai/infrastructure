@@ -23,6 +23,7 @@ locals {
   health_check_path     = "/healthz"
   health_check_port     = 32080
   health_check_protocol = "HTTP"
+  local_domain          = "localhost:3000"
 }
 
 data "aws_availability_zones" "available" {}
@@ -179,8 +180,12 @@ module "auth" {
   account_validation_endpoint          = "https://${var.domain}/auth/account-verification"
   password_reset_confirmation_endpoint = "https://${var.domain}/auth/redefine-password"
   callback_urls = [
-    "https://${var.domain}/auth/google",
-    "http://localhost:3000/auth/google"
+    "https://${var.domain}/auth/callback",
+    "http://${local.local_domain}/auth/callback"
+  ]
+  logout_urls = [
+    "https://${var.domain}",
+    "http://${local.local_domain}"
   ]
 
   # Tokens
@@ -189,8 +194,49 @@ module "auth" {
   refresh_token_validity = "24"
 
   # Domain for UI hosted by Amazon Cognito. Used for social identity providers
+  # If the domain is deleted, we need to wait some time for recreating it again.
+  # Otherwise, AWS complains that the domain is already in use.
   custom_domain          = var.auth_domain
   domain_certificate_arn = module.dns.certificate_arn
+}
+
+################################################################################
+# Authentication - Firebase
+################################################################################
+
+// Records needed for using custom domain in e-mails sent by Firebase
+data "aws_route53_zone" "kubis" {
+  name = var.domain
+}
+
+resource "aws_route53_record" "firebase_cname_1" {
+  zone_id = data.aws_route53_zone.kubis.zone_id
+  name    = "firebase1._domainkey.kubis.ai"
+  type    = "CNAME"
+  ttl     = "5"
+
+  records = ["mail-kubis-ai.dkim1._domainkey.firebasemail.com."]
+}
+
+resource "aws_route53_record" "firebase_cname_2" {
+  zone_id = data.aws_route53_zone.kubis.zone_id
+  name    = "firebase2._domainkey.kubis.ai"
+  type    = "CNAME"
+  ttl     = "5"
+
+  records = ["mail-kubis-ai.dkim2._domainkey.firebasemail.com."]
+}
+
+resource "aws_route53_record" "firebase_txt" {
+  zone_id = data.aws_route53_zone.kubis.zone_id
+  name    = "kubis.ai"
+  type    = "TXT"
+  ttl     = "5"
+
+  records = [
+    "v=spf1 include:_spf.firebasemail.com ~all",
+    "firebase=aerial-ceremony-330017"
+  ]
 }
 
 ################################################################################

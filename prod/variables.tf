@@ -141,6 +141,6 @@ variable "repository_list" {
 ################################################################################
 
 variable "cicd_domain" {
-  description = "Domain used for CI/CD."
+  description = "Domain used for CI/CD. Used, for instance, for setting up webhook endpoints"
   type        = string
 }
