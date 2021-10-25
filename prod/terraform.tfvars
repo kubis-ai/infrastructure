@@ -63,16 +63,11 @@ enable_tls = true
 email_identities = ["noreply@kubis.ai", "mdc.nathalia@gmail.com", "tanel.sarnet@gmail.com"]
 
 ################################################################################
-# Authentication
+# Authentication (Firebase)
 ################################################################################
 
-auth_domain                      = "auth.kubis.ai"
-auth_from_email_address          = "Kubis <noreply@kubis.ai>"
-cognito_client_id_path           = "/prod/auth/cognito-website-client-id"
-cognito_user_pool_id_path        = "/prod/auth/cognito-user-pool-id"
-cognito_custom_domain_path       = "/prod/auth/cognito-custom-domain"
-google_oauth2_client_id_path     = "/prod/auth/google-oauth2-client-id"
-google_oauth2_client_secret_path = "/prod/auth/google-oauth2-client-secret"
+auth_domain               = "auth.kubis.ai"
+firebase_auth_domain_path = "/prod/auth/firebase-auth-domain"
 
 ################################################################################
 # Container registry

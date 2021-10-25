@@ -87,7 +87,7 @@ variable "email_identities" {
 }
 
 ################################################################################
-# Authentication
+# Authentication (Firebase)
 ################################################################################
 
 variable "auth_domain" {
@@ -95,34 +95,8 @@ variable "auth_domain" {
   type        = string
 }
 
-variable "auth_from_email_address" {
-  description = "Sender’s email address or sender’s display name with their email address."
-  type        = string
-}
-
-variable "cognito_client_id_path" {
-  description = "The name for exporting the cognito client id to the AWS Parameter Store."
-  type        = string
-}
-
-variable "cognito_user_pool_id_path" {
-  description = "The name for exporting the cognito user pool id to the AWS Parameter Store."
-  type        = string
-}
-
-
-variable "cognito_custom_domain_path" {
-  description = "The custom domain used for UIs hosted by Amazon Cognito. Used for social identity."
-  type        = string
-}
-
-variable "google_oauth2_client_id_path" {
-  description = "The Google OAuth2 client id name stored in AWS Parameter Store."
-  type        = string
-}
-
-variable "google_oauth2_client_secret_path" {
-  description = "The Google OAuth2 client secret name stored in AWS Parameter Store."
+variable "firebase_auth_domain_path" {
+  description = "The custom domain used by Firebase for authentication."
   type        = string
 }
 
