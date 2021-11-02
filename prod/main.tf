@@ -378,7 +378,7 @@ resource "aws_ssm_parameter" "filesystem_endpoint" {
   name        = var.filesystem_endpoint_path
   description = "The S3 endpoint for the Filesystem service."
   type        = "String"
-  value       = aws_s3_bucket.filesystem_object_store.bucket_domain_name
+  value       = "s3.${aws_s3_bucket.filesystem_object_store.region}.amazonaws.com"
 }
 
 
