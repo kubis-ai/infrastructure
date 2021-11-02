@@ -114,6 +114,11 @@ module "dns" {
       target  = module.nlb.dns_name
       zone_id = module.nlb.zone_id
     },
+    {
+      source  = var.api_domain
+      target  = module.nlb.dns_name
+      zone_id = module.nlb.zone_id
+    },
   ]
 }
 
@@ -302,5 +307,92 @@ module "external_secrets" {
   cluster_oidc_issuer_url = module.cluster.cluster_oidc_issuer_url
 
   depends_on = [module.cert_manager]
+}
+
+################################################################################
+# Filesystem service
+################################################################################
+
+resource "aws_s3_bucket" "filesystem_object_store" {
+  bucket = var.filesystem_bucket_name
+
+  # Prevent accidental deletion of this S3 bucket
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  versioning {
+    enabled = true
+  }
+
+  force_destroy = false
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
+
+resource "aws_iam_user" "filesystem" {
+  name = "FilesystemService"
+}
+
+resource "aws_iam_access_key" "filesystem" {
+  user = aws_iam_user.filesystem.name
+}
+
+
+resource "aws_iam_user_policy" "filesystem_policy" {
+  name = "S3AccessForFilesystemService"
+  user = aws_iam_user.filesystem.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::*/*",
+        "arn:aws:s3:::${aws_s3_bucket.filesystem_object_store.id}"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_ssm_parameter" "filesystem_bucket_name" {
+  name        = var.filesystem_bucket_name_path
+  description = "The name of the S3 bucket for the Filesystem service."
+  type        = "String"
+  value       = aws_s3_bucket.filesystem_object_store.id
+}
+
+resource "aws_ssm_parameter" "filesystem_endpoint" {
+  name        = var.filesystem_endpoint_path
+  description = "The S3 endpoint for the Filesystem service."
+  type        = "String"
+  value       = aws_s3_bucket.filesystem_object_store.bucket_domain_name
+}
+
+
+resource "aws_ssm_parameter" "filesystem_access_key_id" {
+  name        = var.filesystem_access_key_id_path
+  description = "The AWS access key id for the Filesystem service."
+  type        = "String"
+  value       = aws_iam_access_key.filesystem.id
+}
+
+resource "aws_ssm_parameter" "filesystem_access_key_secret" {
+  name        = var.filesystem_access_key_secret_path
+  description = "The AWS access key secret for the Filesystem service."
+  type        = "SecureString"
+  value       = aws_iam_access_key.filesystem.secret
 }
 
