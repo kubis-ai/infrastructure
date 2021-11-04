@@ -58,8 +58,18 @@ module "linkerd" {
   source          = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/linkerd"
   chart_version   = "2.11.1"
   linkerd_version = "stable-2.11.1"
+}
 
-  depends_on = [module.cert_manager]
+################################################################################
+# Linkerd-viz
+################################################################################
+
+module "linkerd_viz" {
+  source          = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/linkerd-viz"
+  chart_version   = "2.11.1"
+  linkerd_version = "stable-2.11.1"
+
+  depends_on = [module.linkerd]
 }
 
 ################################################################################
