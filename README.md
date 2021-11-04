@@ -63,6 +63,7 @@ terraform destroy
 
 ## What is not managed by Terraform?
 
+- Firebase project used for authentication. At the time of development, Firebase did not exist in the Terraform GCP provider so the Firebase project was created manually. Only DNS records creation is included in Terraform.
 - Route53: creation of a hosted zone with NS records associated with the domain. This was done manually after registering the domain with namecheap.com
 - AWS Parameter Store: some of the parameters and secrets are added manually (for example, Google OAuth2 id and secret, GitHub tokens, etc).
 - IAM User for Nathalia
