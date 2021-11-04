@@ -13,7 +13,7 @@ cd global
 terraform apply
 ```
 
-2.  Right now the state associated with the remote backend resources is stored locally. Open the file `global.main.tf` and add a Terraform configuration block
+2.  Right now the state associated with the remote backend resources is stored locally. Open the file `global/main.tf` and add a Terraform configuration block
 
 ```
 terraform {
@@ -30,22 +30,41 @@ cd global
 terraform init -migrate-state -backend-config=../backend.hcl
 ```
 
-3.  Now the remaining infrastucture can be provisioned by running `hack/create-cluster.sh`. This script will bring up the whole production infrastructure and register the cluster with `kubectl`.
+3. For every module check that the remote backend and any `terraform_remote_state` resources are properly configured. For instance in `cluster`:
+
+```
+terraform {
+  backend "s3" {
+    key = "cluster/terraform.tfstate"
+  }
+}
+
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config = {
+    bucket = "terraform-state-kubis"
+    key    = "network/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+```
+
+4. Now the remaining infrastucture can be provisioned by running `hack/create.sh` and selecting the option 'All'. This script will bring up the whole production infrastructure and register the cluster with `kubectl`.
 
 ```
 cd hack
-sh create-cluster.sh
+bash create.sh
 ```
 
 ## How to uninstall?
 
 Uninstalling is done in three steps:
 
-1. Destroy the production infrastructure and deregister the cluster in `kubectl` with `hack/destroy-cluster.sh`. Only the infrastructure related to Terraform's remote backend will remain.
+1. Destroy the production infrastructure and deregister the cluster in `kubectl` by running `hack/destroy.sh` with the option 'All'. Only the infrastructure related to Terraform's remote backend will remain.
 
 ```
 cd hack
-sh destroy-cluster.sh
+bash destroy.sh
 ```
 
 2. In order to destroy the infrastructure associated with the remote backend (S3 buckets and DynamoDB tables), we must first switch to a local backend. Open the file `global/main.tf` and comment out the `terraform` configuration block. Reinitialize terraform with
