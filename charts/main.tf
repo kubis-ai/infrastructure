@@ -51,25 +51,28 @@ module "nginx_ingress" {
 }
 
 ################################################################################
-# Linkerd
+# Istio
 ################################################################################
 
-module "linkerd" {
-  source          = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/linkerd"
-  chart_version   = "2.11.1"
-  linkerd_version = "stable-2.11.1"
+module "istio_base" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/istio-base"
+  chart_version = "1.11.4"
+}
+
+module "istio_discovery" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/istio-discovery"
+  chart_version = "1.11.4"
+  depends_on    = [module.istio_base]
 }
 
 ################################################################################
-# Linkerd-viz
+# Kiali
 ################################################################################
 
-module "linkerd_viz" {
-  source          = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/linkerd-viz"
-  chart_version   = "2.11.1"
-  linkerd_version = "stable-2.11.1"
-
-  depends_on = [module.linkerd]
+module "kiali_operator" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/kiali-operator"
+  chart_version = "1.42.0"
+  depends_on    = [module.istio_discovery]
 }
 
 ################################################################################
