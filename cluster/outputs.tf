@@ -33,6 +33,11 @@ output "https_node_port" {
   value       = local.https_node_port
 }
 
+output "health_check_port" {
+  description = "The port for the health check endpoint."
+  value       = local.health_check_port
+}
+
 output "health_check_path" {
   description = "The path for the health check endpoint."
   value       = local.health_check_path

@@ -23,8 +23,8 @@ provider "aws" {
 locals {
   http_node_port        = 32080
   https_node_port       = 32443
-  health_check_path     = "/healthz"
-  health_check_port     = 32080
+  health_check_port     = 32021
+  health_check_path     = "/healthz/ready"
   health_check_protocol = "HTTP"
 }
 

@@ -33,24 +33,6 @@ module "cert_manager" {
 }
 
 ################################################################################
-# NGINX Ingress Controller
-################################################################################
-
-module "nginx_ingress" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/nginx-ingress"
-  chart_version = "0.10.0"
-
-  service_type    = "NodePort"
-  controller_kind = "daemonset"
-
-  http_node_port    = data.terraform_remote_state.cluster.outputs.http_node_port
-  https_node_port   = data.terraform_remote_state.cluster.outputs.https_node_port
-  health_check_path = data.terraform_remote_state.cluster.outputs.health_check_path
-
-  depends_on = [module.cert_manager]
-}
-
-################################################################################
 # Istio
 ################################################################################
 
@@ -63,6 +45,18 @@ module "istio_discovery" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/istio-discovery"
   chart_version = "1.11.4"
   depends_on    = [module.istio_base]
+}
+
+module "istio_ingress" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/istio-ingress"
+  chart_version = "1.11.4"
+
+  http_node_port    = data.terraform_remote_state.cluster.outputs.http_node_port
+  https_node_port   = data.terraform_remote_state.cluster.outputs.https_node_port
+  health_check_port = data.terraform_remote_state.cluster.outputs.health_check_port
+  service_type      = "NodePort"
+
+  depends_on = [module.istio_base, module.istio_discovery]
 }
 
 ################################################################################
@@ -90,7 +84,6 @@ module "external_secrets" {
 
   depends_on = [module.cert_manager]
 }
-
 
 ################################################################################
 # Tekton Pipelines
