@@ -42,9 +42,9 @@ module "cluster" {
 
   enable_irsa = true
 
-  allow_traffic_from_nlb         = true
-  allow_traffic_from_cidr_blocks = ["0.0.0.0/0"]
-  allow_traffic_from_node_ports  = [local.http_node_port, local.https_node_port, local.health_check_port]
+  allow_traffic_from_alb = true
+  alb_security_group_id  = module.alb.security_group_id
+  application_ports      = [local.http_node_port, local.https_node_port, local.health_check_port]
 
   write_kubeconfig       = true
   kubeconfig_output_path = var.kubeconfig_output_path
@@ -56,7 +56,7 @@ module "cluster" {
     asg_min_size         = var.spot_workers.asg_min_size
     instance_type        = var.spot_workers.instance_type
     spot_price           = var.spot_workers.spot_price
-    target_group_arns    = module.nlb.target_group_arns
+    target_group_arns    = values(module.alb.target_group_arns)
   }]
 }
 
@@ -73,21 +73,37 @@ module "dns" {
 }
 
 ################################################################################
-# Network Load Balancer
+# Application Load Balancer
 ################################################################################
 
-module "nlb" {
-  source = "git@github.com:kubis-ai/terraform-modules.git//modules/nlb"
-  name   = "nlb"
+module "alb" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/alb"
+  name   = "alb"
 
   vpc_id     = data.terraform_remote_state.network.outputs.vpc_id
   subnet_ids = data.terraform_remote_state.network.outputs.public_subnets
 
-  http_node_port      = local.http_node_port
-  https_node_port     = local.https_node_port
+  enable_tls          = true
   tls_certificate_arn = module.dns.certificate_arn
 
-  health_check_path     = local.health_check_path
-  health_check_port     = local.health_check_port
-  health_check_protocol = local.health_check_protocol
+  applications = {
+    http = {
+      protocol              = "HTTP",
+      protocol_version      = "HTTP1"
+      path_pattern          = "*",
+      node_port             = local.http_node_port,
+      health_check_path     = local.health_check_path,
+      health_check_port     = local.health_check_port,
+      health_check_protocol = local.health_check_protocol,
+    },
+    https = {
+      protocol              = "HTTPS",
+      protocol_version      = "HTTP1"
+      path_pattern          = "*",
+      node_port             = local.https_node_port,
+      health_check_path     = local.health_check_path,
+      health_check_port     = local.health_check_port,
+      health_check_protocol = local.health_check_protocol,
+    },
+  }
 }

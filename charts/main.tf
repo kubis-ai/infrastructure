@@ -26,7 +26,6 @@ data "terraform_remote_state" "cluster" {
 ################################################################################
 # cert-manager
 ################################################################################
-
 module "cert_manager" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/cert-manager"
   chart_version = "v1.6.1"
@@ -88,7 +87,6 @@ module "external_secrets" {
 ################################################################################
 # Tekton Pipelines
 ################################################################################
-
 module "tekton_pipelines" {
   source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/tekton-pipelines"
   chart_version = "0.27.3"
