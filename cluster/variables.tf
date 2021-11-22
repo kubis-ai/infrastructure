@@ -34,13 +34,14 @@ variable "kubernetes_version" {
 variable "spot_workers" {
   description = "Configuration for spot workers."
   type = object({
-    name                 = string
-    instance_type        = string
-    asg_desired_capacity = number
-    asg_min_size         = number
-    asg_max_size         = number
-    spot_price           = string
-    kubelet_extra_args   = string
+    name                    = string
+    instance_type           = string
+    override_instance_types = list(string)
+    asg_desired_capacity    = number
+    asg_min_size            = number
+    asg_max_size            = number
+    spot_price              = string
+    kubelet_extra_args      = string
   })
 }
 

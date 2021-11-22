@@ -49,14 +49,16 @@ module "cluster" {
   write_kubeconfig       = true
   kubeconfig_output_path = var.kubeconfig_output_path
 
-  worker_groups = [{
-    name                 = var.spot_workers.name
-    asg_desired_capacity = var.spot_workers.asg_desired_capacity
-    asg_max_size         = var.spot_workers.asg_max_size
-    asg_min_size         = var.spot_workers.asg_min_size
-    instance_type        = var.spot_workers.instance_type
-    spot_price           = var.spot_workers.spot_price
-    target_group_arns    = values(module.alb.target_group_arns)
+  worker_groups_launch_template = [{
+    name                    = var.spot_workers.name
+    instance_type           = var.spot_workers.instance_type
+    override_instance_types = var.spot_workers.override_instance_types,
+    asg_desired_capacity    = var.spot_workers.asg_desired_capacity
+    asg_min_size            = var.spot_workers.asg_min_size
+    asg_max_size            = var.spot_workers.asg_max_size
+    spot_price              = var.spot_workers.spot_price
+    kubelet_extra_args      = var.spot_workers.kubelet_extra_args,
+    target_group_arns       = values(module.alb.target_group_arns)
   }]
 }
 
