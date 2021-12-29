@@ -26,7 +26,7 @@ firebase_auth_domain_path = "/prod/auth/firebase-auth-domain"
 # Container registry
 ################################################################################
 
-repository_list = ["website", "filesystem"]
+repository_list = ["website", "filesystem", "cloud"]
 
 ################################################################################
 # Filesystem service
