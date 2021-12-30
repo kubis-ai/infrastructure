@@ -83,3 +83,42 @@ variable "filesystem_access_key_secret_path" {
   description = "The path to the AWS access key secret param in the AWS Parameter Store."
   type        = string
 }
+
+################################################################################
+# Cloud service
+################################################################################
+
+variable "cloud_db_instance_class" {
+  description = "The instance class for the Cloud service database."
+  type        = string
+}
+
+variable "cloud_db_deletion_protection" {
+  description = "Whether to protect the database against deletion."
+  type        = bool
+}
+
+variable "cloud_db_allocated_storage" {
+  description = "The allocated storage in gibibytes."
+  type        = number
+}
+
+variable "cloud_db_final_snapshot_identifier" {
+  description = "The name of your final DB snapshot when this DB instance is deleted."
+  type        = string
+}
+
+variable "cloud_database_name_path" {
+  description = "The path to the Cloud service database name param in the AWS Parameter Store."
+  type        = string
+}
+
+variable "cloud_database_user_path" {
+  description = "The path to the Cloud service database user param in the AWS Parameter Store."
+  type        = string
+}
+
+variable "cloud_database_password_path" {
+  description = "The path to the Cloud service database password param in the AWS Parameter Store."
+  type        = string
+}
