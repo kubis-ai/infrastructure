@@ -47,6 +47,4 @@ cloud_db_deletion_protection       = true
 cloud_db_allocated_storage         = 10
 cloud_db_final_snapshot_identifier = "cloud-db-final-snapshot"
 
-cloud_database_name_path     = "/prod/cloud/database-name"
-cloud_database_user_path     = "/prod/cloud/database-user"
-cloud_database_password_path = "/prod/cloud/database-password"
+cloud_database_connection_uri_path = "/prod/cloud/database-connection-uri"

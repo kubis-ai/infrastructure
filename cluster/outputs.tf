@@ -57,3 +57,8 @@ output "zone_id" {
   description = "The canonical hosted zone ID of the load balancer (to be used in a Route 53 Alias record)."
   value       = module.alb.zone_id
 }
+
+output "worker_security_group_id" {
+  description = "Security group id attached to the worker groups."
+  value       = module.cluster.worker_security_group_id
+}

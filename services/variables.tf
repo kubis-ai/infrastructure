@@ -108,17 +108,7 @@ variable "cloud_db_final_snapshot_identifier" {
   type        = string
 }
 
-variable "cloud_database_name_path" {
-  description = "The path to the Cloud service database name param in the AWS Parameter Store."
-  type        = string
-}
-
-variable "cloud_database_user_path" {
-  description = "The path to the Cloud service database user param in the AWS Parameter Store."
-  type        = string
-}
-
-variable "cloud_database_password_path" {
-  description = "The path to the Cloud service database password param in the AWS Parameter Store."
+variable "cloud_database_connection_uri_path" {
+  description = "The path to the Cloud service database connection URI param in the AWS Parameter Store."
   type        = string
 }

@@ -8,20 +8,20 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "terraform_remote_state" "cluster" {
-  backend = "s3"
-  config = {
-    bucket = "terraform-state-kubis"
-    key    = "cluster/terraform.tfstate"
-    region = "us-east-1"
-  }
-}
-
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
     bucket = "terraform-state-kubis"
     key    = "network/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
+data "terraform_remote_state" "cluster" {
+  backend = "s3"
+  config = {
+    bucket = "terraform-state-kubis"
+    key    = "cluster/terraform.tfstate"
     region = "us-east-1"
   }
 }
@@ -228,6 +228,20 @@ resource "aws_db_subnet_group" "cloud_db" {
   subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
 }
 
+resource "aws_security_group" "allow_traffic_from_cluster" {
+  name        = "allow_traffic_from_cluster"
+  description = "Allow traffic from the cluster nodes."
+  vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
+
+  ingress {
+    description     = "Allows traffic on port 5432."
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [data.terraform_remote_state.cluster.outputs.worker_security_group_id]
+  }
+}
+
 resource "random_password" "password" {
   length           = 16
   special          = true
@@ -246,7 +260,7 @@ resource "aws_db_instance" "cloud_db" {
   password = random_password.password.result
   port     = "5432"
 
-  vpc_security_group_ids = [data.terraform_remote_state.network.outputs.vpc_security_group_id]
+  vpc_security_group_ids = [aws_security_group.allow_traffic_from_cluster.id]
   db_subnet_group_name   = aws_db_subnet_group.cloud_db.id
 
   maintenance_window        = "Mon:00:00-Mon:03:00"
@@ -257,23 +271,9 @@ resource "aws_db_instance" "cloud_db" {
   deletion_protection = var.cloud_db_deletion_protection
 }
 
-resource "aws_ssm_parameter" "cloud_database_name" {
-  name        = var.cloud_database_name_path
-  description = "The name of the Cloud service database."
-  type        = "String"
-  value       = aws_db_instance.cloud_db.name
-}
-
-resource "aws_ssm_parameter" "cloud_database_user" {
-  name        = var.cloud_database_user_path
-  description = "The user to sign in as for the Cloud service database."
-  type        = "String"
-  value       = aws_db_instance.cloud_db.username
-}
-
-resource "aws_ssm_parameter" "cloud_database_password" {
-  name        = var.cloud_database_password_path
-  description = "The user's password for the Cloud service database."
+resource "aws_ssm_parameter" "cloud_database_connection_uri" {
+  name        = var.cloud_database_connection_uri_path
+  description = "The connection URI for the Cloud service database."
   type        = "SecureString"
-  value       = aws_db_instance.cloud_db.password
+  value       = "postgres://${urlencode("${aws_db_instance.cloud_db.username}")}:${urlencode("${aws_db_instance.cloud_db.password}")}@${aws_db_instance.cloud_db.endpoint}/${aws_db_instance.cloud_db.name}"
 }
