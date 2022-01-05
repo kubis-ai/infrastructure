@@ -212,9 +212,9 @@ resource "aws_ssm_parameter" "filesystem_access_key_id" {
   value       = aws_iam_access_key.filesystem.id
 }
 
-resource "aws_ssm_parameter" "filesystem_access_key_secret" {
-  name        = var.filesystem_access_key_secret_path
-  description = "The AWS access key secret for the Filesystem service."
+resource "aws_ssm_parameter" "filesystem_secret_access_key" {
+  name        = var.filesystem_secret_access_key_path
+  description = "The AWS secret access key for the Filesystem service."
   type        = "SecureString"
   value       = aws_iam_access_key.filesystem.secret
 }
@@ -276,4 +276,46 @@ resource "aws_ssm_parameter" "cloud_database_connection_uri" {
   description = "The connection URI for the Cloud service database."
   type        = "SecureString"
   value       = "postgres://${urlencode("${aws_db_instance.cloud_db.username}")}:${urlencode("${aws_db_instance.cloud_db.password}")}@${aws_db_instance.cloud_db.endpoint}/${aws_db_instance.cloud_db.name}"
+}
+
+resource "aws_iam_user" "cloud" {
+  name = "CloudService"
+}
+
+resource "aws_iam_access_key" "cloud" {
+  user = aws_iam_user.cloud.name
+}
+
+resource "aws_iam_user_policy" "cloud_policy" {
+  name = "PricingAccessForCloudService"
+  user = aws_iam_user.cloud.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "pricing:GetProducts",
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_ssm_parameter" "cloud_access_key_id" {
+  name        = var.cloud_access_key_id_path
+  description = "The AWS access key id for the Cloud service."
+  type        = "String"
+  value       = aws_iam_access_key.cloud.id
+}
+
+resource "aws_ssm_parameter" "cloud_secret_access_key" {
+  name        = var.cloud_secret_access_key_path
+  description = "The AWS secret access key for the Cloud service."
+  type        = "SecureString"
+  value       = aws_iam_access_key.cloud.secret
 }

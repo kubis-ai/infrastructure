@@ -79,8 +79,8 @@ variable "filesystem_access_key_id_path" {
   type        = string
 }
 
-variable "filesystem_access_key_secret_path" {
-  description = "The path to the AWS access key secret param in the AWS Parameter Store."
+variable "filesystem_secret_access_key_path" {
+  description = "The path to the AWS secret access key param in the AWS Parameter Store."
   type        = string
 }
 
@@ -110,5 +110,15 @@ variable "cloud_db_final_snapshot_identifier" {
 
 variable "cloud_database_connection_uri_path" {
   description = "The path to the Cloud service database connection URI param in the AWS Parameter Store."
+  type        = string
+}
+
+variable "cloud_access_key_id_path" {
+  description = "The path to the AWS access key id param in the AWS Parameter Store."
+  type        = string
+}
+
+variable "cloud_secret_access_key_path" {
+  description = "The path to the AWS secret access key param in the AWS Parameter Store."
   type        = string
 }

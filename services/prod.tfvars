@@ -36,7 +36,7 @@ filesystem_bucket_name = "filesystem-kubis-prod"
 filesystem_endpoint_path          = "/prod/filesystem/object-storage-endpoint"
 filesystem_bucket_name_path       = "/prod/filesystem/object-storage-bucket-name"
 filesystem_access_key_id_path     = "/prod/filesystem/object-storage-access-key-id"
-filesystem_access_key_secret_path = "/prod/filesystem/object-storage-access-key-secret"
+filesystem_secret_access_key_path = "/prod/filesystem/object-storage-secret-access-key"
 
 ################################################################################
 # Cloud service
@@ -48,3 +48,5 @@ cloud_db_allocated_storage         = 10
 cloud_db_final_snapshot_identifier = "cloud-db-final-snapshot"
 
 cloud_database_connection_uri_path = "/prod/cloud/database-connection-uri"
+cloud_access_key_id_path           = "/prod/cloud/aws-sdk-access-key-id"
+cloud_secret_access_key_path       = "/prod/cloud/aws-sdk-secret-access-key"
