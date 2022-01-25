@@ -119,3 +119,12 @@ module "tekton_dashboard" {
 
   depends_on = [module.tekton_pipelines]
 }
+
+################################################################################
+# Strimzi Operator (Kafka)
+################################################################################
+
+module "strimzi_operator" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/strimzi-operator"
+  chart_version = "0.27.1"
+}
