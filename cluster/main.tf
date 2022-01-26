@@ -88,6 +88,8 @@ module "alb" {
   enable_tls          = true
   tls_certificate_arn = module.dns.certificate_arn
 
+  idle_timeout = 1200
+
   applications = {
     http = {
       protocol              = "HTTP",
