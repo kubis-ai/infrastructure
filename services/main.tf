@@ -245,7 +245,7 @@ resource "aws_db_subnet_group" "cloud_db" {
 resource "random_password" "cloud_db_password" {
   length           = 16
   special          = true
-  override_special = "_%@"
+  override_special = "%@"
 }
 
 resource "aws_db_instance" "cloud_db" {
