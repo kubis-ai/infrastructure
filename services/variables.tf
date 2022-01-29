@@ -122,3 +122,32 @@ variable "cloud_secret_access_key_path" {
   description = "The path to the AWS secret access key param in the AWS Parameter Store."
   type        = string
 }
+
+################################################################################
+# Notebook service
+################################################################################
+
+variable "notebook_db_instance_class" {
+  description = "The instance class for the Notebook service database."
+  type        = string
+}
+
+variable "notebook_db_deletion_protection" {
+  description = "Whether to protect the database against deletion."
+  type        = bool
+}
+
+variable "notebook_db_allocated_storage" {
+  description = "The allocated storage in gibibytes."
+  type        = number
+}
+
+variable "notebook_db_final_snapshot_identifier" {
+  description = "The name of your final DB snapshot when this DB instance is deleted."
+  type        = string
+}
+
+variable "notebook_database_connection_uri_path" {
+  description = "The path to the Notebook service database connection URI param in the AWS Parameter Store."
+  type        = string
+}

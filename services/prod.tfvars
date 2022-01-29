@@ -50,3 +50,14 @@ cloud_db_final_snapshot_identifier = "cloud-db-final-snapshot"
 cloud_database_connection_uri_path = "/prod/cloud/database-connection-uri"
 cloud_access_key_id_path           = "/prod/cloud/aws-sdk-access-key-id"
 cloud_secret_access_key_path       = "/prod/cloud/aws-sdk-secret-access-key"
+
+################################################################################
+# Notebook service
+################################################################################
+
+notebook_db_instance_class            = "db.t4g.micro"
+notebook_db_deletion_protection       = true
+notebook_db_allocated_storage         = 10
+notebook_db_final_snapshot_identifier = "notebook-db-final-snapshot"
+
+notebook_database_connection_uri_path = "/prod/notebook/database-connection-uri"

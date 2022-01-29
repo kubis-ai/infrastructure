@@ -223,11 +223,6 @@ resource "aws_ssm_parameter" "filesystem_secret_access_key" {
 # Cloud service
 ################################################################################
 
-resource "aws_db_subnet_group" "cloud_db" {
-  name       = "cloud_db_main"
-  subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
-}
-
 resource "aws_security_group" "allow_traffic_from_cluster" {
   name        = "allow_traffic_from_cluster"
   description = "Allow traffic from the cluster nodes."
@@ -242,7 +237,12 @@ resource "aws_security_group" "allow_traffic_from_cluster" {
   }
 }
 
-resource "random_password" "password" {
+resource "aws_db_subnet_group" "cloud_db" {
+  name       = "cloud_db_main"
+  subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
+}
+
+resource "random_password" "cloud_db_password" {
   length           = 16
   special          = true
   override_special = "_%@"
@@ -257,7 +257,7 @@ resource "aws_db_instance" "cloud_db" {
   allocated_storage = var.cloud_db_allocated_storage
 
   username = "cloud_db"
-  password = random_password.password.result
+  password = random_password.cloud_db_password.result
   port     = "5432"
 
   vpc_security_group_ids = [aws_security_group.allow_traffic_from_cluster.id]
@@ -318,4 +318,49 @@ resource "aws_ssm_parameter" "cloud_secret_access_key" {
   description = "The AWS secret access key for the Cloud service."
   type        = "SecureString"
   value       = aws_iam_access_key.cloud.secret
+}
+
+################################################################################
+# Notebook service
+################################################################################
+
+resource "aws_db_subnet_group" "notebook_db" {
+  name       = "notebook_db_main"
+  subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
+}
+
+resource "random_password" "notebook_db_password" {
+  length           = 16
+  special          = true
+  override_special = "%@"
+}
+
+resource "aws_db_instance" "notebook_db" {
+  name = "notebook_db"
+
+  engine            = "postgres"
+  engine_version    = "13.4"
+  instance_class    = var.notebook_db_instance_class
+  allocated_storage = var.notebook_db_allocated_storage
+
+  username = "notebook_db"
+  password = random_password.notebook_db_password.result
+  port     = "5432"
+
+  vpc_security_group_ids = [aws_security_group.allow_traffic_from_cluster.id]
+  db_subnet_group_name   = aws_db_subnet_group.notebook_db.id
+
+  maintenance_window        = "Mon:00:00-Mon:03:00"
+  backup_window             = "03:00-06:00"
+  skip_final_snapshot       = false
+  final_snapshot_identifier = var.notebook_db_final_snapshot_identifier
+
+  deletion_protection = var.notebook_db_deletion_protection
+}
+
+resource "aws_ssm_parameter" "notebook_database_connection_uri" {
+  name        = var.notebook_database_connection_uri_path
+  description = "The connection URI for the Notebook service database."
+  type        = "SecureString"
+  value       = "postgres://${urlencode("${aws_db_instance.notebook_db.username}")}:${urlencode("${aws_db_instance.notebook_db.password}")}@${aws_db_instance.notebook_db.endpoint}/${aws_db_instance.notebook_db.name}"
 }
