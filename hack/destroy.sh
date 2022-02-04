@@ -48,6 +48,11 @@ destroy_services() {
     destroy $SERVICES
 }
 
+destroy_params() {
+    echo '[+] Destroying params'
+    destroy $PARAMS
+}
+
 ################################################
 # Menu
 ################################################
@@ -55,7 +60,7 @@ destroy_services() {
 load_paths
 
 while true; do
-    options=("Network" "Cluster" "Charts" "Services" "All")
+    options=("Network" "Cluster" "Charts" "Services" "Params" "All")
 
     echo "Select a module to destroy: "
     select opt in "${options[@]}"; do
@@ -76,11 +81,16 @@ while true; do
                 destroy_services
                 break
                 ;;
+            "Params")
+                destroy_params
+                break
+                ;;
             "All")
                 destroy_network
                 destroy_cluster
                 destroy_charts
                 destroy_services
+                destroy_params
                 break
                 ;;
             *) echo "invalid option $REPLY";;

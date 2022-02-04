@@ -60,6 +60,11 @@ create_services() {
     create $SERVICES
 }
 
+create_params() {
+    echo '[+] Creating params'
+    create $PARAMS
+}
+
 ################################################
 # Menu
 ################################################
@@ -67,7 +72,7 @@ create_services() {
 load_paths
 
 while true; do
-    options=("Network" "Cluster" "Charts" "Services" "All")
+    options=("Network" "Cluster" "Charts" "Services" "Params" "All")
 
     echo "Select a module to create: "
     select opt in "${options[@]}"; do
@@ -88,11 +93,16 @@ while true; do
                 create_services
                 break
                 ;;
+            "Params")
+                create_params
+                break
+                ;;
             "All")
                 create_network
                 create_cluster
                 create_charts
                 create_services
+                create_params
                 break
                 ;;
             *) echo "invalid option $REPLY";;
