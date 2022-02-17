@@ -27,6 +27,11 @@ variable "api_domain" {
   type        = string
 }
 
+variable "docs_domain" {
+  description = "Domain used for the Docs."
+  type        = string
+}
+
 ################################################################################
 # Email
 ################################################################################

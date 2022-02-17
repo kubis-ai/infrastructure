@@ -51,6 +51,11 @@ module "dns" {
       target  = data.terraform_remote_state.cluster.outputs.dns_name
       zone_id = data.terraform_remote_state.cluster.outputs.zone_id
     },
+    {
+      source  = var.docs_domain
+      target  = data.terraform_remote_state.cluster.outputs.dns_name
+      zone_id = data.terraform_remote_state.cluster.outputs.zone_id
+    },
   ]
 }
 
