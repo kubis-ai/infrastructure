@@ -117,7 +117,7 @@ resource "aws_ssm_parameter" "firebase_auth_domain" {
 }
 
 ################################################################################
-# Email
+# Email (SES)
 ################################################################################
 
 module "email" {
@@ -126,6 +126,60 @@ module "email" {
   domain           = var.domain
   email_identities = var.email_identities
   aws_region       = var.aws_region
+}
+
+################################################################################
+# Email (WorkMail)
+################################################################################
+
+data "aws_route53_zone" "primary" {
+  name         = var.domain
+  private_zone = false
+}
+
+resource "aws_route53_record" "mx" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = data.aws_route53_zone.primary.name
+  type    = "MX"
+  ttl     = 86400
+  records = ["10 inbound-smtp.${var.aws_region}.amazonaws.com."]
+}
+
+// enable Autodiscover service for Outlook and other clients
+resource "aws_route53_record" "autodiscover" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "autodiscover.${data.aws_route53_zone.primary.name}"
+  type    = "CNAME"
+  ttl     = 86400
+  records = ["autodiscover.mail.${var.aws_region}.awsapps.com."]
+}
+
+// SES identity / verification
+resource "aws_ses_domain_identity" "identity" {
+  domain = data.aws_route53_zone.primary.name
+}
+
+// DKIM
+resource "aws_ses_domain_dkim" "dkim" {
+  domain = aws_ses_domain_identity.identity.domain
+}
+
+resource "aws_route53_record" "dkim" {
+  count   = 3
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "${element(aws_ses_domain_dkim.dkim.dkim_tokens, count.index)}._domainkey.${data.aws_route53_zone.primary.name}"
+  type    = "CNAME"
+  ttl     = "600"
+  records = ["${element(aws_ses_domain_dkim.dkim.dkim_tokens, count.index)}.dkim.amazonses.com."]
+}
+
+// DMARC record
+resource "aws_route53_record" "dmarc" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "_dmarc.${data.aws_route53_zone.primary.name}"
+  type    = "TXT"
+  ttl     = 86400
+  records = ["v=DMARC1;p=quarantine;pct=100;fo=1;"]
 }
 
 ################################################################################
