@@ -86,3 +86,4 @@ terraform destroy
 - Route53: creation of a hosted zone with NS records associated with the domain. This was done manually after registering the domain with namecheap.com
 - AWS Parameter Store: some of the parameters and secrets are added manually (for example, Google OAuth2 id and secret, GitHub tokens, etc).
 - IAM User for Nathalia
+- WorkMail service
