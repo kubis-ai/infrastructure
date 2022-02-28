@@ -62,3 +62,4 @@ notebook_db_allocated_storage         = 10
 notebook_db_final_snapshot_identifier = "notebook-db-final-snapshot"
 
 notebook_database_connection_uri_path = "/prod/notebook/database-connection-uri"
+notebook_redis_connection_uri_path    = "/prod/notebook/redis-connection-uri"

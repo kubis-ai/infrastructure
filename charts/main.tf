@@ -121,10 +121,10 @@ module "tekton_dashboard" {
 }
 
 ################################################################################
-# Strimzi Operator (Kafka)
+# Redis
 ################################################################################
 
-module "strimzi_operator" {
-  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/strimzi-operator"
-  chart_version = "0.27.1"
+module "redis" {
+  source        = "git@github.com:kubis-ai/terraform-modules.git//modules/apps/redis"
+  chart_version = "16.4.4"
 }

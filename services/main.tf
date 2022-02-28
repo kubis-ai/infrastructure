@@ -26,6 +26,15 @@ data "terraform_remote_state" "cluster" {
   }
 }
 
+data "terraform_remote_state" "charts" {
+  backend = "s3"
+  config = {
+    bucket = "terraform-state-kubis"
+    key    = "charts/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 ################################################################################
 # CDN (CloudFront)
 ################################################################################
@@ -509,4 +518,11 @@ resource "aws_ssm_parameter" "notebook_database_connection_uri" {
   description = "The connection URI for the Notebook service database."
   type        = "SecureString"
   value       = "postgres://${urlencode("${aws_db_instance.notebook_db.username}")}:${urlencode("${aws_db_instance.notebook_db.password}")}@${aws_db_instance.notebook_db.endpoint}/${aws_db_instance.notebook_db.name}"
+}
+
+resource "aws_ssm_parameter" "notebook_redis_connection_uri" {
+  name        = var.notebook_redis_connection_uri_path
+  description = "The connection URI for the Notebook service Redis."
+  type        = "SecureString"
+  value       = data.terraform_remote_state.charts.outputs.redis_connection_uri
 }

@@ -156,3 +156,8 @@ variable "notebook_database_connection_uri_path" {
   description = "The path to the Notebook service database connection URI param in the AWS Parameter Store."
   type        = string
 }
+
+variable "notebook_redis_connection_uri_path" {
+  description = "The path to the Notebook service Redis connection URI param in the AWS Parameter Store."
+  type        = string
+}
