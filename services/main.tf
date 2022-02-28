@@ -374,6 +374,47 @@ resource "aws_ssm_parameter" "filesystem_secret_access_key" {
   value       = aws_iam_access_key.filesystem.secret
 }
 
+resource "aws_db_subnet_group" "filesystem_db" {
+  name       = "filesystem_db_main"
+  subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
+}
+
+resource "random_password" "filesystem_db_password" {
+  length           = 16
+  special          = true
+  override_special = "%@"
+}
+
+resource "aws_db_instance" "filesystem_db" {
+  name = "filesystem_db"
+
+  engine            = "postgres"
+  engine_version    = "13.4"
+  instance_class    = var.filesystem_db_instance_class
+  allocated_storage = var.filesystem_db_allocated_storage
+
+  username = "filesystem_db"
+  password = random_password.filesystem_db_password.result
+  port     = "5432"
+
+  vpc_security_group_ids = [aws_security_group.allow_traffic_from_cluster.id]
+  db_subnet_group_name   = aws_db_subnet_group.filesystem_db.id
+
+  maintenance_window        = "Mon:00:00-Mon:03:00"
+  backup_window             = "03:00-06:00"
+  skip_final_snapshot       = false
+  final_snapshot_identifier = var.filesystem_db_final_snapshot_identifier
+
+  deletion_protection = var.filesystem_db_deletion_protection
+}
+
+resource "aws_ssm_parameter" "filesystem_database_connection_uri" {
+  name        = var.filesystem_database_connection_uri_path
+  description = "The connection URI for the Filesystem service database."
+  type        = "SecureString"
+  value       = "postgres://${urlencode("${aws_db_instance.filesystem_db.username}")}:${urlencode("${aws_db_instance.filesystem_db.password}")}@${aws_db_instance.filesystem_db.endpoint}/${aws_db_instance.filesystem_db.name}"
+}
+
 ################################################################################
 # Cloud service
 ################################################################################

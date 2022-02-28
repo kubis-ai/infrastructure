@@ -34,10 +34,17 @@ repository_list = ["website", "docs", "filesystem", "cloud", "notebook"]
 
 filesystem_bucket_name = "filesystem-kubis-prod"
 
-filesystem_endpoint_path          = "/prod/filesystem/object-storage-endpoint"
-filesystem_bucket_name_path       = "/prod/filesystem/object-storage-bucket-name"
-filesystem_access_key_id_path     = "/prod/filesystem/object-storage-access-key-id"
-filesystem_secret_access_key_path = "/prod/filesystem/object-storage-secret-access-key"
+filesystem_db_instance_class            = "db.t4g.micro"
+filesystem_db_deletion_protection       = true
+filesystem_db_allocated_storage         = 10
+filesystem_db_final_snapshot_identifier = "filesystem-db-final-snapshot"
+
+filesystem_endpoint_path                = "/prod/filesystem/object-storage-endpoint"
+filesystem_bucket_name_path             = "/prod/filesystem/object-storage-bucket-name"
+filesystem_access_key_id_path           = "/prod/filesystem/object-storage-access-key-id"
+filesystem_secret_access_key_path       = "/prod/filesystem/object-storage-secret-access-key"
+filesystem_database_connection_uri_path = "/prod/filesystem/database-connection-uri"
+
 
 ################################################################################
 # Cloud service

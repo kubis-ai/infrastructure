@@ -89,6 +89,32 @@ variable "filesystem_secret_access_key_path" {
   type        = string
 }
 
+variable "filesystem_db_instance_class" {
+  description = "The instance class for the Filesystem service database."
+  type        = string
+}
+
+variable "filesystem_db_deletion_protection" {
+  description = "Whether to protect the database against deletion."
+  type        = bool
+}
+
+variable "filesystem_db_allocated_storage" {
+  description = "The allocated storage in gibibytes."
+  type        = number
+}
+
+variable "filesystem_db_final_snapshot_identifier" {
+  description = "The name of your final DB snapshot when this DB instance is deleted."
+  type        = string
+}
+
+
+variable "filesystem_database_connection_uri_path" {
+  description = "The path to the Filesystem service database connection URI param in the AWS Parameter Store."
+  type        = string
+}
+
 ################################################################################
 # Cloud service
 ################################################################################
