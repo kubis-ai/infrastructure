@@ -58,6 +58,8 @@ cloud_db_final_snapshot_identifier = "cloud-db-final-snapshot"
 cloud_database_connection_uri_path = "/prod/cloud/database-connection-uri"
 cloud_access_key_id_path           = "/prod/cloud/aws-sdk-access-key-id"
 cloud_secret_access_key_path       = "/prod/cloud/aws-sdk-secret-access-key"
+cloud_aws_cpu_machine_image_path   = "/prod/cloud/aws-cpu-machine-image"
+cloud_aws_gpu_machine_image_path   = "/prod/cloud/aws-gpu-machine-image"
 
 ################################################################################
 # Notebook service

@@ -154,6 +154,16 @@ variable "cloud_secret_access_key_path" {
   type        = string
 }
 
+variable "cloud_aws_cpu_machine_image_path" {
+  description = "The path to the AWS CPU machine image in the AWS Parameter Store."
+  type        = string
+}
+
+variable "cloud_aws_gpu_machine_image_path" {
+  description = "The path to the AWS GPU machine image in the AWS Parameter Store."
+  type        = string
+}
+
 ################################################################################
 # Notebook service
 ################################################################################

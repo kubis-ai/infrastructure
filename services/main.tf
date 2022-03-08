@@ -516,6 +516,42 @@ resource "aws_ssm_parameter" "cloud_secret_access_key" {
   value       = aws_iam_access_key.cloud.secret
 }
 
+data "aws_ami" "cpu_machine_image" {
+  most_recent = true
+
+  owners = ["045329000471"]
+
+  filter {
+    name   = "name"
+    values = ["kubis-deep-learning-py36-cpu-*"]
+  }
+}
+
+resource "aws_ssm_parameter" "aws_cpu_machine_image" {
+  name        = var.cloud_aws_cpu_machine_image_path
+  description = "The AWS CPU machine image for the Cloud service."
+  type        = "String"
+  value       = data.aws_ami.cpu_machine_image.id
+}
+
+data "aws_ami" "gpu_machine_image" {
+  most_recent = true
+
+  owners = ["045329000471"]
+
+  filter {
+    name   = "name"
+    values = ["kubis-deep-learning-py36-gpu-*"]
+  }
+}
+
+resource "aws_ssm_parameter" "aws_gpu_machine_image" {
+  name        = var.cloud_aws_gpu_machine_image_path
+  description = "The AWS GPU machine image for the Cloud service."
+  type        = "String"
+  value       = data.aws_ami.gpu_machine_image.id
+}
+
 ################################################################################
 # Notebook service
 ################################################################################
