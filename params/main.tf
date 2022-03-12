@@ -41,3 +41,14 @@ resource "aws_ssm_parameter" "cloud_service_private_endpoint" {
   type        = "String"
   value       = "cloud-service.cloud:80"
 }
+
+################################################################################
+# Analytics
+################################################################################
+
+resource "aws_ssm_parameter" "mixpanel_project_id" {
+  name        = var.mixpanel_project_id_path
+  description = "Project id for Mixpanel."
+  type        = "String"
+  value       = "2da9599fca04547821c9cb5eb3193868"
+}

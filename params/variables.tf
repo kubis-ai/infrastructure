@@ -26,3 +26,12 @@ variable "cloud_service_private_endpoint_path" {
   description = "The path to the AWS Cloud service private endpoint param in the AWS Parameter Store."
   type        = string
 }
+
+################################################################################
+# Analytics
+################################################################################
+
+variable "mixpanel_project_id_path" {
+  description = "The path to the Mixpanel project id param in the AWS Parameter Store."
+  type        = string
+}
