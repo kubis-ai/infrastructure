@@ -482,10 +482,9 @@ resource "aws_iam_access_key" "cloud" {
   user = aws_iam_user.cloud.name
 }
 
-// Policy gives cloud service permission to request pricing of AWS products.
-resource "aws_iam_user_policy" "cloud_pricing_policy" {
-  name = "PricingAccessForCloudService"
-  user = aws_iam_user.cloud.name
+resource "aws_iam_policy" "cloud_pricing_policy" {
+  name        = "PricingAccessForCloudService"
+  description = "This policy gives cloud service permission to request pricing of AWS products."
 
   policy = <<EOF
 {
@@ -503,10 +502,14 @@ resource "aws_iam_user_policy" "cloud_pricing_policy" {
 EOF
 }
 
-// Policy allows cloud service to gain access of users' AWS accounts.
-resource "aws_iam_user_policy" "cloud_assume_role_policy" {
-  name = "AssumeRoleForCloudService"
-  user = aws_iam_user.cloud.name
+resource "aws_iam_user_policy_attachment" "cloud_pricing_policy_attach" {
+  user       = aws_iam_user.cloud.name
+  policy_arn = aws_iam_policy.cloud_pricing_policy.arn
+}
+
+resource "aws_iam_policy" "cloud_assume_role_policy" {
+  name        = "AssumeRoleForCloudService"
+  description = "This policy allows cloud service to gain access of users' AWS accounts."
 
   policy = <<EOF
 {
@@ -522,6 +525,11 @@ resource "aws_iam_user_policy" "cloud_assume_role_policy" {
   ]
 }
 EOF
+}
+
+resource "aws_iam_user_policy_attachment" "cloud_assume_role_policy_attach" {
+  user       = aws_iam_user.cloud.name
+  policy_arn = aws_iam_policy.cloud_assume_role_policy.arn
 }
 
 resource "aws_ssm_parameter" "cloud_access_key_id" {
