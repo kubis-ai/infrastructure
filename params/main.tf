@@ -52,3 +52,21 @@ resource "aws_ssm_parameter" "mixpanel_project_id" {
   type        = "String"
   value       = "2da9599fca04547821c9cb5eb3193868"
 }
+
+################################################################################
+# Eventing
+################################################################################
+
+resource "aws_ssm_parameter" "kafka_address" {
+  name        = var.kafka_address_path
+  description = "Kafka address"
+  type        = "String"
+  value       = "kafka-cluster-kafka-bootstrap.strimzi.svc:9092"
+}
+
+resource "aws_ssm_parameter" "runtime_status_topic" {
+  name        = var.runtime_status_topic_path
+  description = "Kafka topic for runtime status events"
+  type        = "String"
+  value       = "aws.notebook.fct.runtime-status.0"
+}
