@@ -9,6 +9,23 @@ provider "aws" {
 }
 
 ################################################################################
+# Auth
+################################################################################
+
+resource "random_password" "auth_shared_key" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "aws_ssm_parameter" "service_token_shared_key" {
+  name        = var.service_token_shared_key_path
+  description = "The shared key for signing id tokens for service accounts."
+  type        = "SecureString"
+  value       = random_password.auth_shared_key.result
+}
+
+################################################################################
 # Service endpoints
 ################################################################################
 # These service endpoints should be manually synced with the Kubernetes configurations
