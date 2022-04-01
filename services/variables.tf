@@ -164,6 +164,12 @@ variable "cloud_aws_gpu_machine_image_path" {
   type        = string
 }
 
+variable "cloud_redis_connection_uri_path" {
+  description = "The path to the Cloud service Redis connection URI param in the AWS Parameter Store."
+  type        = string
+}
+
+
 ################################################################################
 # Notebook service
 ################################################################################

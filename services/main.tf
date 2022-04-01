@@ -582,6 +582,13 @@ resource "aws_ssm_parameter" "aws_gpu_machine_image" {
   value       = data.aws_ami.gpu_machine_image.id
 }
 
+resource "aws_ssm_parameter" "cloud_redis_connection_uri" {
+  name        = var.cloud_redis_connection_uri_path
+  description = "The connection URI for the Cloud service Redis."
+  type        = "SecureString"
+  value       = data.terraform_remote_state.charts.outputs.redis_connection_uri
+}
+
 ################################################################################
 # Notebook service
 ################################################################################
