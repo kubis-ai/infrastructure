@@ -36,6 +36,11 @@ variable "cloud_service_private_endpoint_path" {
   type        = string
 }
 
+variable "notebook_service_private_endpoint_path" {
+  description = "The path to the AWS Notebook service private endpoint param in the AWS Parameter Store."
+  type        = string
+}
+
 ################################################################################
 # Analytics
 ################################################################################

@@ -59,6 +59,13 @@ resource "aws_ssm_parameter" "cloud_service_private_endpoint" {
   value       = "cloud-service.cloud:80"
 }
 
+resource "aws_ssm_parameter" "notebook_service_private_endpoint" {
+  name        = var.notebook_service_private_endpoint_path
+  description = "The Notebook service private endpoint."
+  type        = "String"
+  value       = "notebook-service.notebook:80"
+}
+
 ################################################################################
 # Analytics
 ################################################################################
