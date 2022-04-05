@@ -44,17 +44,3 @@ variable "mixpanel_project_id_path" {
   description = "The path to the Mixpanel project id param in the AWS Parameter Store."
   type        = string
 }
-
-################################################################################
-# Eventing
-################################################################################
-
-variable "kafka_address_path" {
-  description = "The path to the Kafka address in the AWS Parameter Store."
-  type        = string
-}
-
-variable "runtime_status_topic_path" {
-  description = "The path to the Kafka topic for runtime status updates in the AWS Parameter Store."
-  type        = string
-}
