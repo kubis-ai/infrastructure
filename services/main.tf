@@ -138,6 +138,11 @@ module "dns" {
       zone_id = aws_cloudfront_distribution.alb_distribution.hosted_zone_id
     },
     {
+      source  = var.docs_domain
+      target  = aws_cloudfront_distribution.alb_distribution.domain_name
+      zone_id = aws_cloudfront_distribution.alb_distribution.hosted_zone_id
+    },
+    {
       source  = var.cicd_domain
       target  = data.terraform_remote_state.cluster.outputs.alb_dns_name
       zone_id = data.terraform_remote_state.cluster.outputs.alb_zone_id
@@ -148,9 +153,9 @@ module "dns" {
       zone_id = data.terraform_remote_state.cluster.outputs.alb_zone_id
     },
     {
-      source  = var.docs_domain
-      target  = aws_cloudfront_distribution.alb_distribution.domain_name
-      zone_id = aws_cloudfront_distribution.alb_distribution.hosted_zone_id
+      source  = var.admin_domain
+      target  = data.terraform_remote_state.cluster.outputs.alb_dns_name
+      zone_id = data.terraform_remote_state.cluster.outputs.alb_zone_id
     },
   ]
 }
