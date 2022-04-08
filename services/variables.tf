@@ -32,6 +32,11 @@ variable "docs_domain" {
   type        = string
 }
 
+variable "admin_domain" {
+  description = "Domain used for the Admin dashboard."
+  type        = string
+}
+
 ################################################################################
 # Email
 ################################################################################

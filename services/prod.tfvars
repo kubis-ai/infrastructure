@@ -4,11 +4,12 @@ aws_region = "us-east-1"
 # Domains
 ################################################################################
 
-domain      = "kubis.ai"
-cicd_domain = "cicd.kubis.ai"
-api_domain  = "api.kubis.ai"
-auth_domain = "auth.kubis.ai"
-docs_domain = "docs.kubis.ai"
+domain       = "kubis.ai"
+cicd_domain  = "cicd.kubis.ai"
+api_domain   = "api.kubis.ai"
+auth_domain  = "auth.kubis.ai"
+docs_domain  = "docs.kubis.ai"
+admin_domain = "admin.kubis.ai"
 
 ################################################################################
 # Email
@@ -26,7 +27,7 @@ firebase_auth_domain_path = "/prod/auth/firebase-auth-domain"
 # Container registry
 ################################################################################
 
-repository_list = ["website", "docs", "filesystem", "cloud", "notebook"]
+repository_list = ["website", "docs", "admin", "filesystem", "cloud", "notebook"]
 
 ################################################################################
 # Filesystem service
