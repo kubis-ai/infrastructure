@@ -52,11 +52,11 @@ resource "aws_ssm_parameter" "notebook_service_public_endpoint" {
   value       = "api.kubis.ai/notebook"
 }
 
-resource "aws_ssm_parameter" "user_service_public_endpoint" {
-  name        = var.user_service_public_endpoint_path
-  description = "The User service public endpoint."
+resource "aws_ssm_parameter" "auth_service_public_endpoint" {
+  name        = var.auth_service_public_endpoint_path
+  description = "The Auth service public endpoint."
   type        = "String"
-  value       = "api.kubis.ai/user"
+  value       = "api.kubis.ai/auth"
 }
 
 resource "aws_ssm_parameter" "cloud_service_private_endpoint" {
