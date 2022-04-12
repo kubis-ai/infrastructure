@@ -82,3 +82,5 @@ billing_db_instance_class            = "db.t4g.micro"
 billing_db_deletion_protection       = true
 billing_db_allocated_storage         = 10
 billing_db_final_snapshot_identifier = "billing-db-final-snapshot"
+
+billing_database_connection_uri_path = "/prod/billing/database-connection-uri"
