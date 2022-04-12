@@ -46,7 +46,6 @@ filesystem_access_key_id_path           = "/prod/filesystem/object-storage-acces
 filesystem_secret_access_key_path       = "/prod/filesystem/object-storage-secret-access-key"
 filesystem_database_connection_uri_path = "/prod/filesystem/database-connection-uri"
 
-
 ################################################################################
 # Cloud service
 ################################################################################
@@ -74,3 +73,12 @@ notebook_db_final_snapshot_identifier = "notebook-db-final-snapshot"
 
 notebook_database_connection_uri_path = "/prod/notebook/database-connection-uri"
 notebook_redis_connection_uri_path    = "/prod/notebook/redis-connection-uri"
+
+################################################################################
+# Billing service
+################################################################################
+
+billing_db_instance_class            = "db.t4g.micro"
+billing_db_deletion_protection       = true
+billing_db_allocated_storage         = 10
+billing_db_final_snapshot_identifier = "billing-db-final-snapshot"

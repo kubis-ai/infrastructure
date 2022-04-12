@@ -59,6 +59,13 @@ resource "aws_ssm_parameter" "auth_service_public_endpoint" {
   value       = "api.kubis.ai/auth"
 }
 
+resource "aws_ssm_parameter" "billing_service_public_endpoint" {
+  name        = var.billing_service_public_endpoint_path
+  description = "The Billing service public endpoint."
+  type        = "String"
+  value       = "api.kubis.ai/billing"
+}
+
 resource "aws_ssm_parameter" "cloud_service_private_endpoint" {
   name        = var.cloud_service_private_endpoint_path
   description = "The Cloud service private endpoint."

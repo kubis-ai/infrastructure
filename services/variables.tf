@@ -208,3 +208,32 @@ variable "notebook_redis_connection_uri_path" {
   description = "The path to the Notebook service Redis connection URI param in the AWS Parameter Store."
   type        = string
 }
+
+################################################################################
+# Billing service
+################################################################################
+
+variable "billing_db_instance_class" {
+  description = "The instance class for the Billing service database."
+  type        = string
+}
+
+variable "billing_db_deletion_protection" {
+  description = "Whether to protect the database against deletion."
+  type        = bool
+}
+
+variable "billing_db_allocated_storage" {
+  description = "The allocated storage in gibibytes."
+  type        = number
+}
+
+variable "billing_db_final_snapshot_identifier" {
+  description = "The name of your final DB snapshot when this DB instance is deleted."
+  type        = string
+}
+
+variable "billing_database_connection_uri_path" {
+  description = "The path to the Billing service database connection URI param in the AWS Parameter Store."
+  type        = string
+}
