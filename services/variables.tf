@@ -32,6 +32,11 @@ variable "docs_domain" {
   type        = string
 }
 
+variable "blog_domain" {
+  description = "Domain used for the Blog."
+  type        = string
+}
+
 variable "admin_domain" {
   description = "Domain used for the Admin dashboard."
   type        = string

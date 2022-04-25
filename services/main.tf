@@ -60,7 +60,7 @@ resource "aws_cloudfront_distribution" "alb_distribution" {
   is_ipv6_enabled = true
   price_class     = "PriceClass_100"
 
-  aliases = [var.domain, "www.${var.domain}", var.docs_domain, ]
+  aliases = [var.domain, "www.${var.domain}", var.docs_domain, var.blog_domain]
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -139,6 +139,11 @@ module "dns" {
     },
     {
       source  = var.docs_domain
+      target  = aws_cloudfront_distribution.alb_distribution.domain_name
+      zone_id = aws_cloudfront_distribution.alb_distribution.hosted_zone_id
+    },
+    {
+      source  = var.blog_domain
       target  = aws_cloudfront_distribution.alb_distribution.domain_name
       zone_id = aws_cloudfront_distribution.alb_distribution.hosted_zone_id
     },

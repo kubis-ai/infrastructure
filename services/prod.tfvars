@@ -9,6 +9,7 @@ cicd_domain  = "cicd.kubis.ai"
 api_domain   = "api.kubis.ai"
 auth_domain  = "auth.kubis.ai"
 docs_domain  = "docs.kubis.ai"
+blog_domain  = "blog.kubis.ai"
 admin_domain = "admin.kubis.ai"
 
 ################################################################################
@@ -27,7 +28,7 @@ firebase_auth_domain_path = "/prod/auth/firebase-auth-domain"
 # Container registry
 ################################################################################
 
-repository_list = ["website", "docs", "admin", "auth", "billing", "filesystem", "cloud", "notebook"]
+repository_list = ["website", "docs", "blog", "admin", "auth", "billing", "filesystem", "cloud", "notebook"]
 
 ################################################################################
 # Filesystem service
