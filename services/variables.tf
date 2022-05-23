@@ -42,6 +42,11 @@ variable "admin_domain" {
   type        = string
 }
 
+variable "mymlops_domain" {
+  description = "My MLOps domain name."
+  type        = string
+}
+
 ################################################################################
 # Email
 ################################################################################

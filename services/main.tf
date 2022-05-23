@@ -40,7 +40,8 @@ data "terraform_remote_state" "charts" {
 ################################################################################
 
 locals {
-  alb_origin_id = "alb"
+  alb_origin_id         = "alb"
+  mymlops_alb_origin_id = "mymlops_alb"
 }
 
 resource "aws_cloudfront_distribution" "alb_distribution" {
@@ -120,6 +121,84 @@ resource "aws_cloudfront_distribution" "alb_distribution" {
   }
 }
 
+resource "aws_cloudfront_distribution" "mymlops_alb_distribution" {
+  origin {
+    origin_id   = local.mymlops_alb_origin_id
+    domain_name = data.terraform_remote_state.cluster.outputs.mymlops_alb_dns_name
+
+    custom_origin_config {
+      http_port              = "80"
+      https_port             = "443"
+      origin_protocol_policy = "match-viewer"
+      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+    }
+  }
+
+  enabled         = true
+  is_ipv6_enabled = true
+  price_class     = "PriceClass_100"
+
+  aliases = [var.mymlops_domain, "www.${var.mymlops_domain}"]
+
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = local.mymlops_alb_origin_id
+
+    viewer_protocol_policy = "allow-all"
+
+
+    min_ttl     = 0
+    default_ttl = 1800
+    max_ttl     = 3600
+    compress    = true
+
+    forwarded_values {
+      query_string = true
+      headers      = ["*"]
+
+      cookies {
+        forward = "all"
+      }
+    }
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    acm_certificate_arn = data.terraform_remote_state.cluster.outputs.mymlops_acm_certificate_arn
+    ssl_support_method  = "sni-only"
+  }
+
+  # By default, cloudfront caches error for five minutes. There can be situation when a developer has
+  # accidentally broken the website and you would not want to wait for five minutes for the error response to be cached.
+  # https://docs.aws.amazon.com/AmazonS3/latest/dev/CustomErrorDocSupport.html
+  custom_error_response {
+    error_code            = 400
+    error_caching_min_ttl = 30
+  }
+
+  custom_error_response {
+    error_code            = 403
+    error_caching_min_ttl = 30
+  }
+
+  custom_error_response {
+    error_code            = 404
+    error_caching_min_ttl = 30
+  }
+
+  custom_error_response {
+    error_code            = 405
+    error_caching_min_ttl = 30
+  }
+}
+
+
 ################################################################################
 # Domain aliasing
 ################################################################################
@@ -162,6 +241,23 @@ module "dns" {
       target  = data.terraform_remote_state.cluster.outputs.alb_dns_name
       zone_id = data.terraform_remote_state.cluster.outputs.alb_zone_id
     },
+  ]
+}
+
+
+module "mymlops_dns" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/dns"
+
+  domain = var.mymlops_domain
+
+  # All domains pointing to a CloudFront distribution must also be configured as
+  # aliases in the CloudFront settings.
+  alias = [
+    {
+      source  = var.mymlops_domain,
+      target  = aws_cloudfront_distribution.mymlops_alb_distribution.domain_name
+      zone_id = aws_cloudfront_distribution.mymlops_alb_distribution.hosted_zone_id
+    }
   ]
 }
 

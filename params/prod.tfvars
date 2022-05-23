@@ -23,4 +23,5 @@ notebook_service_private_endpoint_path = "/prod/notebook/private-service-endpoin
 # Analytics
 ################################################################################
 
-mixpanel_project_id_path = "/prod/analytics/mixpanel-project-id"
+mixpanel_project_id_path         = "/prod/analytics/mixpanel-project-id"
+mixpanel_mymlops_project_id_path = "/prod/analytics/mixpanel-mymlops-project-id"

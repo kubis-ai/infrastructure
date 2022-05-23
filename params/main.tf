@@ -91,3 +91,9 @@ resource "aws_ssm_parameter" "mixpanel_project_id" {
   value       = "2da9599fca04547821c9cb5eb3193868"
 }
 
+resource "aws_ssm_parameter" "mixpanel_mymlops_project_id" {
+  name        = var.mixpanel_mymlops_project_id_path
+  description = "My MLOps project id for Mixpanel."
+  type        = "String"
+  value       = "61c3b6128972fb63b3b7114ec656559f"
+}

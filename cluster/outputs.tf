@@ -58,9 +58,24 @@ output "alb_zone_id" {
   value       = module.alb.zone_id
 }
 
+output "mymlops_alb_dns_name" {
+  description = "The DNS name of My MLOps load balancer."
+  value       = module.mymlops_alb.dns_name
+}
+
+output "mymlops_alb_zone_id" {
+  description = "The canonical hosted zone ID of the load balancer (to be used in a Route 53 Alias record)."
+  value       = module.mymlops_alb.zone_id
+}
+
 output "acm_certificate_arn" {
   description = "The ARN of the domain certificate issued by AWS Certificate Manager."
   value       = module.dns.certificate_arn
+}
+
+output "mymlops_acm_certificate_arn" {
+  description = "The ARN of the domain certificate issued by AWS Certificate Manager."
+  value       = module.mymlops_dns.certificate_arn
 }
 
 output "worker_security_group_id" {

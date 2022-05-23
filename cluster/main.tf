@@ -74,6 +74,14 @@ module "dns" {
   create_certificate = true
 }
 
+module "mymlops_dns" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/dns"
+
+  domain             = var.mymlops_domain
+  subdomains         = var.mymlops_subdomains
+  create_certificate = true
+}
+
 ################################################################################
 # Application Load Balancer
 ################################################################################
@@ -87,6 +95,40 @@ module "alb" {
 
   enable_tls          = true
   tls_certificate_arn = module.dns.certificate_arn
+
+  idle_timeout = 1200
+
+  applications = {
+    http = {
+      protocol              = "HTTP",
+      protocol_version      = "HTTP1"
+      path_pattern          = "*",
+      node_port             = local.http_node_port,
+      health_check_path     = local.health_check_path,
+      health_check_port     = local.health_check_port,
+      health_check_protocol = local.health_check_protocol,
+    },
+    https = {
+      protocol              = "HTTPS",
+      protocol_version      = "HTTP1"
+      path_pattern          = "*",
+      node_port             = local.https_node_port,
+      health_check_path     = local.health_check_path,
+      health_check_port     = local.health_check_port,
+      health_check_protocol = local.health_check_protocol,
+    },
+  }
+}
+
+module "mymlops_alb" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/alb"
+  name   = "mymlops-alb"
+
+  vpc_id     = data.terraform_remote_state.network.outputs.vpc_id
+  subnet_ids = data.terraform_remote_state.network.outputs.public_subnets
+
+  enable_tls          = true
+  tls_certificate_arn = module.mymlops_dns.certificate_arn
 
   idle_timeout = 1200
 

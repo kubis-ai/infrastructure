@@ -17,6 +17,16 @@ variable "subdomains" {
   type        = list(string)
 }
 
+variable "mymlops_domain" {
+  description = "My MLOps tool domain"
+  type        = string
+}
+
+variable "mymlops_subdomains" {
+  description = "List of My MLOps subdomains."
+  type        = list(string)
+}
+
 ################################################################################
 # Cluster
 ################################################################################

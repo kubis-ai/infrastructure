@@ -59,3 +59,8 @@ variable "mixpanel_project_id_path" {
   description = "The path to the Mixpanel project id param in the AWS Parameter Store."
   type        = string
 }
+
+variable "mixpanel_mymlops_project_id_path" {
+  description = "The path to the Mixpanel My MLOps project id param in the AWS Parameter Store."
+  type        = string
+}
