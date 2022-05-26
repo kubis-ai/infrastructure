@@ -42,9 +42,16 @@ module "cluster" {
 
   enable_irsa = true
 
-  allow_traffic_from_alb = true
-  alb_security_group_id  = module.alb.security_group_id
-  application_ports      = [local.http_node_port, local.https_node_port, local.health_check_port]
+  alb_traffic_config = [
+    {
+      alb_security_group_id = module.alb.security_group_id
+      application_ports     = [local.http_node_port, local.https_node_port, local.health_check_port]
+    },
+    {
+      alb_security_group_id = module.mymlops_alb.security_group_id
+      application_ports     = [local.http_node_port, local.https_node_port, local.health_check_port]
+    }
+  ]
 
   write_kubeconfig       = true
   kubeconfig_output_path = var.kubeconfig_output_path
@@ -58,7 +65,7 @@ module "cluster" {
     asg_max_size            = var.spot_workers.asg_max_size
     spot_price              = var.spot_workers.spot_price
     kubelet_extra_args      = var.spot_workers.kubelet_extra_args,
-    target_group_arns       = values(module.alb.target_group_arns)
+    target_group_arns       = concat(values(module.alb.target_group_arns), values(module.mymlops_alb.target_group_arns))
   }]
 }
 
