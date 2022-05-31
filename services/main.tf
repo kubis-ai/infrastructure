@@ -275,6 +275,25 @@ module "mymlops_dns" {
 }
 
 ################################################################################
+# Google Search Console
+################################################################################
+
+data "aws_route53_zone" "mymlops" {
+  name = var.mymlops_domain
+}
+
+resource "aws_route53_record" "search_console_txt" {
+  zone_id = data.aws_route53_zone.mymlops.zone_id
+  name    = "mymlops.com"
+  type    = "TXT"
+  ttl     = "5"
+
+  records = [
+    "google-site-verification=JI_J3YsaPnTF3c013aZ1wWk2EbPAq6hurYgUUywjTho",
+  ]
+}
+
+################################################################################
 # Authentication (Firebase)
 ################################################################################
 
