@@ -158,7 +158,7 @@ resource "aws_cloudfront_distribution" "mymlops_alb_distribution" {
       headers      = ["*"]
 
       cookies {
-        forward = "all"
+        forward = "none"
       }
     }
   }

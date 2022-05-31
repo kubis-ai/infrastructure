@@ -25,3 +25,4 @@ notebook_service_private_endpoint_path = "/prod/notebook/private-service-endpoin
 
 mixpanel_project_id_path         = "/prod/analytics/mixpanel-project-id"
 mixpanel_mymlops_project_id_path = "/prod/analytics/mixpanel-mymlops-project-id"
+amplitude_mymlops_api_key_path   = "/prod/analytics/amplitude-mymlops-api-key"

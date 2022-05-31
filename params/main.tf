@@ -97,3 +97,10 @@ resource "aws_ssm_parameter" "mixpanel_mymlops_project_id" {
   type        = "String"
   value       = "61c3b6128972fb63b3b7114ec656559f"
 }
+
+resource "aws_ssm_parameter" "amplitude_mymlops_api_key" {
+  name        = var.amplitude_mymlops_api_key_path
+  description = "My MLOps API key for Amplitude."
+  type        = "String"
+  value       = "2c7adf40adb7c057c81305b9c7989cd7"
+}
