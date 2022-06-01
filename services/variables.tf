@@ -47,6 +47,11 @@ variable "mymlops_domain" {
   type        = string
 }
 
+variable "mymlops_api_domain" {
+  description = "My MLOps API domain name."
+  type        = string
+}
+
 ################################################################################
 # Email
 ################################################################################

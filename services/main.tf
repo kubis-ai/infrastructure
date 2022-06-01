@@ -81,23 +81,7 @@ resource "aws_cloudfront_distribution" "alb_distribution" {
     target_origin_id         = local.alb_origin_id
     cache_policy_id          = data.aws_cloudfront_cache_policy.cache_optimized.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
-
-    viewer_protocol_policy = "allow-all"
-
-
-    # min_ttl     = 0
-    # default_ttl = 1800
-    # max_ttl     = 3600
-    # compress    = true
-
-    # forwarded_values {
-    #   query_string = true
-    #   headers      = ["*"]
-
-    #   cookies {
-    #     forward = "all"
-    #   }
-    # }
+    viewer_protocol_policy   = "allow-all"
   }
 
   restrictions {
@@ -270,6 +254,11 @@ module "mymlops_dns" {
       source  = var.mymlops_domain,
       target  = aws_cloudfront_distribution.mymlops_alb_distribution.domain_name
       zone_id = aws_cloudfront_distribution.mymlops_alb_distribution.hosted_zone_id
+    },
+    {
+      source  = var.mymlops_api_domain
+      target  = data.terraform_remote_state.cluster.outputs.mymlops_alb_dns_name
+      zone_id = data.terraform_remote_state.cluster.outputs.mymlops_alb_zone_id
     }
   ]
 }
