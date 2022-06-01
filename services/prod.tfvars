@@ -29,7 +29,7 @@ firebase_auth_domain_path = "/prod/auth/firebase-auth-domain"
 # Container registry
 ################################################################################
 
-repository_list = ["website", "docs", "blog", "admin", "auth", "billing", "filesystem", "cloud", "notebook", "mymlops"]
+repository_list = ["website", "docs", "blog", "admin", "auth", "billing", "filesystem", "cloud", "notebook", "mymlops", "mymlops-backend"]
 
 ################################################################################
 # Filesystem service
@@ -86,3 +86,14 @@ billing_db_allocated_storage         = 10
 billing_db_final_snapshot_identifier = "billing-db-final-snapshot"
 
 billing_database_connection_uri_path = "/prod/billing/database-connection-uri"
+
+################################################################################
+# MyMLOps backend service
+################################################################################
+
+mymlops_backend_db_instance_class            = "db.t4g.micro"
+mymlops_backend_db_deletion_protection       = true
+mymlops_backend_db_allocated_storage         = 10
+mymlops_backend_db_final_snapshot_identifier = "mymlops-backend-db-final-snapshot"
+
+mymlops_backend_database_connection_uri_path = "/prod/mymlops-backend/database-connection-uri"

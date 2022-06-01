@@ -823,3 +823,48 @@ resource "aws_ssm_parameter" "billing_database_connection_uri" {
   type        = "SecureString"
   value       = "postgres://${urlencode("${aws_db_instance.billing_db.username}")}:${urlencode("${aws_db_instance.billing_db.password}")}@${aws_db_instance.billing_db.endpoint}/${aws_db_instance.billing_db.name}"
 }
+
+################################################################################
+# MyMLOps backend service
+################################################################################
+
+resource "aws_db_subnet_group" "mymlops_backend_db" {
+  name       = "mymlops_backend_db_main"
+  subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
+}
+
+resource "random_password" "mymlops_backend_db_password" {
+  length           = 16
+  special          = true
+  override_special = "%@"
+}
+
+resource "aws_db_instance" "mymlops_backend_db" {
+  name = "mymlops_backend_db"
+
+  engine            = "postgres"
+  engine_version    = "13.4"
+  instance_class    = var.mymlops_backend_db_instance_class
+  allocated_storage = var.mymlops_backend_db_allocated_storage
+
+  username = "mymlops_backend_db"
+  password = random_password.mymlops_backend_db_password.result
+  port     = "5432"
+
+  vpc_security_group_ids = [aws_security_group.allow_traffic_from_cluster.id]
+  db_subnet_group_name   = aws_db_subnet_group.mymlops_backend_db.id
+
+  maintenance_window        = "Mon:00:00-Mon:03:00"
+  backup_window             = "03:00-06:00"
+  skip_final_snapshot       = false
+  final_snapshot_identifier = var.mymlops_backend_db_final_snapshot_identifier
+
+  deletion_protection = var.mymlops_backend_db_deletion_protection
+}
+
+resource "aws_ssm_parameter" "mymlops_backend_database_connection_uri" {
+  name        = var.mymlops_backend_database_connection_uri_path
+  description = "The connection URI for the MyMLOps backend service database."
+  type        = "SecureString"
+  value       = "postgres://${urlencode("${aws_db_instance.mymlops_backend_db.username}")}:${urlencode("${aws_db_instance.mymlops_backend_db.password}")}@${aws_db_instance.mymlops_backend_db.endpoint}/${aws_db_instance.mymlops_backend_db.name}"
+}
