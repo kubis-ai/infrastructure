@@ -857,3 +857,44 @@ resource "aws_ssm_parameter" "mymlops_backend_database_connection_uri" {
   type        = "SecureString"
   value       = "postgres://${urlencode("${aws_db_instance.mymlops_backend_db.username}")}:${urlencode("${aws_db_instance.mymlops_backend_db.password}")}@${aws_db_instance.mymlops_backend_db.endpoint}/${aws_db_instance.mymlops_backend_db.name}"
 }
+
+resource "aws_iam_role" "backend_role" {
+  name = "MyMLOpsBackendRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+
+  inline_policy {
+    name = "AllowSESAccess"
+
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action   = ["ses:SendEmail"]
+          Effect   = "Allow"
+          Resource = "*"
+        },
+      ]
+    })
+  }
+}
+
+resource "aws_ssm_parameter" "mymlops_backend_iam_role_arn" {
+  name        = var.mymlops_backend_iam_role_arn_path
+  description = "The IAM role ARN for the MyMLOps backend service."
+  type        = "String"
+  value       = aws_iam_role.backend_role.arn
+}
+

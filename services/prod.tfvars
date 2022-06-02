@@ -98,3 +98,4 @@ mymlops_backend_db_allocated_storage         = 10
 mymlops_backend_db_final_snapshot_identifier = "mymlops-backend-db-final-snapshot"
 
 mymlops_backend_database_connection_uri_path = "/prod/mymlops-backend/database-connection-uri"
+mymlops_backend_iam_role_arn_path            = "/prod/mymlops-backend/iam-role-arn"

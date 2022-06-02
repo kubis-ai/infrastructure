@@ -282,3 +282,8 @@ variable "mymlops_backend_database_connection_uri_path" {
   type        = string
 }
 
+variable "mymlops_backend_iam_role_arn_path" {
+  description = "The path to the MyMLOps backend service IAM role ARN param in the AWS Parameter Store."
+  type        = string
+}
+
