@@ -104,3 +104,14 @@ resource "aws_ssm_parameter" "amplitude_mymlops_api_key" {
   type        = "String"
   value       = "2c7adf40adb7c057c81305b9c7989cd7"
 }
+
+################################################################################
+# reCAPTCHA
+################################################################################
+
+resource "aws_ssm_parameter" "mymlops_recaptcha_site_key" {
+  name        = var.mymlops_recaptcha_site_key_path
+  description = "My MLOps reCAPTCHA site key."
+  type        = "String"
+  value       = "6LdN9D4gAAAAAOZREBhYDOXhS2Xs54o1EM07dYfy"
+}

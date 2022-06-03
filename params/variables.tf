@@ -69,3 +69,12 @@ variable "amplitude_mymlops_api_key_path" {
   description = "The path to the Amplitude My MLOps API key param in the AWS Parameter Store."
   type        = string
 }
+
+################################################################################
+# reCAPTCHA
+################################################################################
+
+variable "mymlops_recaptcha_site_key_path" {
+  description = "The path to the reCAPTCHA site key param in the AWS Parameter Store."
+  type        = string
+}
