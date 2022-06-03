@@ -858,43 +858,43 @@ resource "aws_ssm_parameter" "mymlops_backend_database_connection_uri" {
   value       = "postgres://${urlencode("${aws_db_instance.mymlops_backend_db.username}")}:${urlencode("${aws_db_instance.mymlops_backend_db.password}")}@${aws_db_instance.mymlops_backend_db.endpoint}/${aws_db_instance.mymlops_backend_db.name}"
 }
 
-resource "aws_iam_role" "backend_role" {
-  name = "MyMLOpsBackendRole"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
-
-  inline_policy {
-    name = "AllowSESAccess"
-
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action   = ["ses:SendEmail"]
-          Effect   = "Allow"
-          Resource = "*"
-        },
-      ]
-    })
-  }
+resource "aws_iam_user" "mymlops_backend" {
+  name = "MyMLOpsBackendService"
 }
 
-resource "aws_ssm_parameter" "mymlops_backend_iam_role_arn" {
-  name        = var.mymlops_backend_iam_role_arn_path
-  description = "The IAM role ARN for the MyMLOps backend service."
+resource "aws_iam_access_key" "mymlops_backend" {
+  user = aws_iam_user.mymlops_backend.name
+}
+
+resource "aws_iam_user_policy" "mymlops_backend_policy" {
+  name = "SESAccessForMyMLOpsBackendService"
+  user = aws_iam_user.mymlops_backend.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ses:SendEmail",
+      "Resource": ["*"]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_ssm_parameter" "mymlops_backend_access_key_id" {
+  name        = var.mymlops_backend_access_key_id_path
+  description = "The AWS access key id for the MyMLOps Backend service."
   type        = "String"
-  value       = aws_iam_role.backend_role.arn
+  value       = aws_iam_access_key.mymlops_backend.id
 }
 
+resource "aws_ssm_parameter" "mymlops_backend_secret_access_key" {
+  name        = var.mymlops_backend_secret_access_key_path
+  description = "The AWS secret access key for the MyMLOps Backend service."
+  type        = "SecureString"
+  value       = aws_iam_access_key.mymlops_backend.secret
+}

@@ -98,4 +98,5 @@ mymlops_backend_db_allocated_storage         = 10
 mymlops_backend_db_final_snapshot_identifier = "mymlops-backend-db-final-snapshot"
 
 mymlops_backend_database_connection_uri_path = "/prod/mymlops-backend/database-connection-uri"
-mymlops_backend_iam_role_arn_path            = "/prod/mymlops-backend/iam-role-arn"
+mymlops_backend_access_key_id_path           = "/prod/mymlops-backend/aws-access-key-id"
+mymlops_backend_secret_access_key_path       = "/prod/mymlops-backend/aws-secret-access-key"
