@@ -52,6 +52,11 @@ variable "mymlops_api_domain" {
   type        = string
 }
 
+variable "mymlops_auth_domain" {
+  description = "My MLOps auth domain name."
+  type        = string
+}
+
 ################################################################################
 # Email
 ################################################################################
@@ -69,6 +74,16 @@ variable "firebase_auth_domain_path" {
   description = "The custom domain used by Firebase for authentication."
   type        = string
 }
+
+################################################################################
+# MyMLOps Authentication (Firebase)
+################################################################################
+
+variable "firebase_mymlops_auth_domain_path" {
+  description = "The custom domain used by Firebase for MyMLOps authentication."
+  type        = string
+}
+
 
 ################################################################################
 # Container registry

@@ -264,25 +264,6 @@ module "mymlops_dns" {
 }
 
 ################################################################################
-# Google Search Console
-################################################################################
-
-data "aws_route53_zone" "mymlops" {
-  name = var.mymlops_domain
-}
-
-resource "aws_route53_record" "search_console_txt" {
-  zone_id = data.aws_route53_zone.mymlops.zone_id
-  name    = "mymlops.com"
-  type    = "TXT"
-  ttl     = "5"
-
-  records = [
-    "google-site-verification=JI_J3YsaPnTF3c013aZ1wWk2EbPAq6hurYgUUywjTho",
-  ]
-}
-
-################################################################################
 # Authentication (Firebase)
 ################################################################################
 
@@ -337,6 +318,55 @@ resource "aws_ssm_parameter" "firebase_auth_domain" {
   description = "The custom domain used by Firebase for authentication."
   type        = "String"
   value       = var.auth_domain
+}
+
+################################################################################
+# MyMLOps Authentication (Firebase) + Google Search Console
+################################################################################
+// Records needed for using custom domain in e-mails sent by Firebase
+// and for custom domain hosting using in OAuth flows
+
+data "aws_route53_zone" "mymlops" {
+  name = var.mymlops_domain
+}
+
+resource "aws_route53_record" "firebase_mymlops_cname_1" {
+  zone_id = data.aws_route53_zone.mymlops.zone_id
+  name    = "firebase1._domainkey.mymlops.com"
+  type    = "CNAME"
+  ttl     = "5"
+
+  records = ["mail-mymlops-com.dkim1._domainkey.firebasemail.com."]
+}
+
+resource "aws_route53_record" "firebase_mymlops_cname_2" {
+  zone_id = data.aws_route53_zone.mymlops.zone_id
+  name    = "firebase2._domainkey.mymlops.com"
+  type    = "CNAME"
+  ttl     = "5"
+
+  records = ["mail-mymlops-com.dkim2._domainkey.firebasemail.com."]
+}
+
+// The last record is from Google Search Console
+resource "aws_route53_record" "firebase_mymlops_txt" {
+  zone_id = data.aws_route53_zone.mymlops.zone_id
+  name    = "mymlops.com"
+  type    = "TXT"
+  ttl     = "5"
+
+  records = [
+    "v=spf1 include:_spf.firebasemail.com ~all",
+    "firebase=mymlops-f828d",
+    "google-site-verification=JI_J3YsaPnTF3c013aZ1wWk2EbPAq6hurYgUUywjTho"
+  ]
+}
+
+resource "aws_ssm_parameter" "firebase_mymlops_auth_domain" {
+  name        = var.firebase_mymlops_auth_domain_path
+  description = "The custom domain used by Firebase for MyMLOps authentication."
+  type        = "String"
+  value       = var.mymlops_auth_domain
 }
 
 ################################################################################

@@ -4,15 +4,17 @@ aws_region = "us-east-1"
 # Domains
 ################################################################################
 
-domain             = "kubis.ai"
-cicd_domain        = "cicd.kubis.ai"
-api_domain         = "api.kubis.ai"
-auth_domain        = "auth.kubis.ai"
-docs_domain        = "docs.kubis.ai"
-blog_domain        = "blog.kubis.ai"
-admin_domain       = "admin.kubis.ai"
-mymlops_domain     = "mymlops.com"
-mymlops_api_domain = "api.mymlops.com"
+domain       = "kubis.ai"
+cicd_domain  = "cicd.kubis.ai"
+api_domain   = "api.kubis.ai"
+auth_domain  = "auth.kubis.ai"
+docs_domain  = "docs.kubis.ai"
+blog_domain  = "blog.kubis.ai"
+admin_domain = "admin.kubis.ai"
+
+mymlops_domain      = "mymlops.com"
+mymlops_api_domain  = "api.mymlops.com"
+mymlops_auth_domain = "auth.mymlops.com"
 
 ################################################################################
 # Email
@@ -25,6 +27,12 @@ email_identities = ["noreply@kubis.ai"]
 ################################################################################
 
 firebase_auth_domain_path = "/prod/auth/firebase-auth-domain"
+
+################################################################################
+# MyMLOps Authentication (Firebase)
+################################################################################
+
+firebase_mymlops_auth_domain_path = "/prod/auth/firebase-mymlops-auth-domain"
 
 ################################################################################
 # Container registry
