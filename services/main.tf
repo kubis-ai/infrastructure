@@ -362,6 +362,17 @@ resource "aws_route53_record" "firebase_mymlops_txt" {
   ]
 }
 
+// This setting configures the social login callback url. It can be configured in Firebase
+// under Hosting.
+resource "aws_route53_record" "firebase_mymlops_auth_domain" {
+  zone_id = data.aws_route53_zone.mymlops.zone_id
+  name    = var.mymlops_auth_domain
+  type    = "A"
+  ttl     = "5"
+
+  records = ["199.36.158.100"]
+}
+
 resource "aws_ssm_parameter" "firebase_mymlops_auth_domain" {
   name        = var.firebase_mymlops_auth_domain_path
   description = "The custom domain used by Firebase for MyMLOps authentication."
