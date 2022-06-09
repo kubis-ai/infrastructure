@@ -25,6 +25,13 @@ resource "aws_ssm_parameter" "service_token_shared_key" {
   value       = random_password.auth_shared_key.result
 }
 
+resource "aws_ssm_parameter" "firebase_mymlops_project_id" {
+  name        = var.firebase_mymlops_project_id_path
+  description = "The firebase project id for MyMLOps."
+  type        = "String"
+  value       = "mymlops-f828d"
+}
+
 ################################################################################
 # Service endpoints
 ################################################################################

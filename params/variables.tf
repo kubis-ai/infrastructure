@@ -12,6 +12,11 @@ variable "service_token_shared_key_path" {
   type        = string
 }
 
+variable "firebase_mymlops_project_id_path" {
+  description = "The path to MyMLOps firebase project id."
+  type        = string
+}
+
 ################################################################################
 # Service endpoints
 ################################################################################

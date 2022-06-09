@@ -4,7 +4,8 @@ aws_region = "us-east-1"
 # Auth
 ################################################################################
 
-service_token_shared_key_path = "/prod/auth/service-token-shared-key"
+service_token_shared_key_path    = "/prod/auth/service-token-shared-key"
+firebase_mymlops_project_id_path = "/prod/auth/firebase-mymlops-project-id"
 
 ################################################################################
 # Service endpoints
