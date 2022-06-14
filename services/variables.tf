@@ -58,11 +58,20 @@ variable "mymlops_auth_domain" {
 }
 
 ################################################################################
-# Email
+# Email (SES)
 ################################################################################
 
 variable "email_identities" {
   description = "List of email identities to be registered with SES."
+  type        = list(string)
+}
+
+################################################################################
+# Email (SES) - MyMLOps
+################################################################################
+
+variable "mymlops_email_identities" {
+  description = "List of MyMLOps email identities to be registered with SES."
   type        = list(string)
 }
 
