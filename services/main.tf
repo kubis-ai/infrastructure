@@ -432,16 +432,16 @@ resource "aws_ses_domain_identity" "mymlops_identity" {
 
 // DKIM
 resource "aws_ses_domain_dkim" "mymlops_dkim" {
-  domain = aws_ses_domain_identity.identity.domain
+  domain = aws_ses_domain_identity.mymlops_identity.domain
 }
 
 resource "aws_route53_record" "mymlops_dkim" {
   count   = 3
   zone_id = data.aws_route53_zone.mymlops.zone_id
-  name    = "${element(aws_ses_domain_dkim.dkim.dkim_tokens, count.index)}._domainkey.${data.aws_route53_zone.mymlops.name}"
+  name    = "${element(aws_ses_domain_dkim.mymlops_dkim.dkim_tokens, count.index)}._domainkey.${data.aws_route53_zone.mymlops.name}"
   type    = "CNAME"
   ttl     = "600"
-  records = ["${element(aws_ses_domain_dkim.dkim.dkim_tokens, count.index)}.dkim.amazonses.com."]
+  records = ["${element(aws_ses_domain_dkim.mymlops_dkim.dkim_tokens, count.index)}.dkim.amazonses.com."]
 }
 
 // DMARC record
