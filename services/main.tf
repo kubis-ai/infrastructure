@@ -1015,6 +1015,52 @@ resource "aws_ssm_parameter" "mymlops_billing_database_connection_uri" {
   value       = "postgres://${urlencode("${aws_db_instance.mymlops_billing_db.username}")}:${urlencode("${aws_db_instance.mymlops_billing_db.password}")}@${aws_db_instance.mymlops_billing_db.endpoint}/${aws_db_instance.mymlops_billing_db.name}"
 }
 
+# Workspaces database
+
+resource "aws_db_subnet_group" "mymlops_workspaces_db" {
+  name       = "mymlops_workspaces_db_main"
+  subnet_ids = data.terraform_remote_state.network.outputs.private_subnets
+}
+
+resource "random_password" "mymlops_workspaces_db_password" {
+  length           = 16
+  special          = true
+  override_special = "%@"
+}
+
+resource "aws_db_instance" "mymlops_workspaces_db" {
+  name       = "mymlops_workspaces_db"
+  identifier = "mymlops-workspaces-db"
+
+  engine            = "postgres"
+  engine_version    = "13.4"
+  instance_class    = var.mymlops_workspaces_db_instance_class
+  allocated_storage = var.mymlops_workspaces_db_allocated_storage
+
+  username = "mymlops_workspaces_db"
+  password = random_password.mymlops_workspaces_db_password.result
+  port     = "5432"
+
+  vpc_security_group_ids = [aws_security_group.allow_traffic_from_cluster.id]
+  db_subnet_group_name   = aws_db_subnet_group.mymlops_workspaces_db.id
+
+  maintenance_window        = "Mon:00:00-Mon:03:00"
+  backup_window             = "03:01-05:00"
+  backup_retention_period   = 7
+  skip_final_snapshot       = false
+  final_snapshot_identifier = var.mymlops_workspaces_db_final_snapshot_identifier
+
+  deletion_protection = var.mymlops_workspaces_db_deletion_protection
+  apply_immediately   = true
+}
+
+resource "aws_ssm_parameter" "mymlops_workspaces_database_connection_uri" {
+  name        = var.mymlops_workspaces_database_connection_uri_path
+  description = "The connection URI for the MyMLOps workspaces service database."
+  type        = "SecureString"
+  value       = "postgres://${urlencode("${aws_db_instance.mymlops_workspaces_db.username}")}:${urlencode("${aws_db_instance.mymlops_workspaces_db.password}")}@${aws_db_instance.mymlops_workspaces_db.endpoint}/${aws_db_instance.mymlops_workspaces_db.name}"
+}
+
 # IAM user
 
 resource "aws_iam_user" "mymlops_backend" {

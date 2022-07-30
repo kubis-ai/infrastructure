@@ -116,7 +116,13 @@ mymlops_billing_db_deletion_protection       = true
 mymlops_billing_db_allocated_storage         = 10
 mymlops_billing_db_final_snapshot_identifier = "mymlops-billing-db-final-snapshot"
 
-mymlops_tooling_database_connection_uri_path = "/prod/mymlops-backend/tooling-database-connection-uri"
-mymlops_billing_database_connection_uri_path = "/prod/mymlops-backend/billing-database-connection-uri"
-mymlops_backend_access_key_id_path           = "/prod/mymlops-backend/aws-access-key-id"
-mymlops_backend_secret_access_key_path       = "/prod/mymlops-backend/aws-secret-access-key"
+mymlops_workspaces_db_instance_class            = "db.t4g.micro"
+mymlops_workspaces_db_deletion_protection       = true
+mymlops_workspaces_db_allocated_storage         = 10
+mymlops_workspaces_db_final_snapshot_identifier = "mymlops-workspaces-db-final-snapshot"
+
+mymlops_tooling_database_connection_uri_path    = "/prod/mymlops-backend/tooling-database-connection-uri"
+mymlops_billing_database_connection_uri_path    = "/prod/mymlops-backend/billing-database-connection-uri"
+mymlops_workspaces_database_connection_uri_path = "/prod/mymlops-backend/workspaces-database-connection-uri"
+mymlops_backend_access_key_id_path              = "/prod/mymlops-backend/aws-access-key-id"
+mymlops_backend_secret_access_key_path          = "/prod/mymlops-backend/aws-secret-access-key"
