@@ -917,11 +917,55 @@ resource "aws_ssm_parameter" "billing_database_connection_uri" {
   value       = "postgres://${urlencode("${aws_db_instance.billing_db.username}")}:${urlencode("${aws_db_instance.billing_db.password}")}@${aws_db_instance.billing_db.endpoint}/${aws_db_instance.billing_db.name}"
 }
 
+
 ################################################################################
-# MyMLOps backend service
+# MyMLOps backend: Contact service
 ################################################################################
 
-# Tooling database
+resource "aws_iam_user" "mymlops_backend" {
+  name = "MyMLOpsBackendContactService"
+}
+
+resource "aws_iam_access_key" "mymlops_backend" {
+  user = aws_iam_user.mymlops_backend.name
+}
+
+resource "aws_iam_user_policy" "mymlops_backend_policy" {
+  name = "SESAccessForMyMLOpsBackendService"
+  user = aws_iam_user.mymlops_backend.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ses:SendEmail",
+      "Resource": ["*"]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_ssm_parameter" "mymlops_backend_access_key_id" {
+  name        = var.mymlops_backend_access_key_id_path
+  description = "The AWS access key id for the MyMLOps Backend service."
+  type        = "String"
+  value       = aws_iam_access_key.mymlops_backend.id
+}
+
+resource "aws_ssm_parameter" "mymlops_backend_secret_access_key" {
+  name        = var.mymlops_backend_secret_access_key_path
+  description = "The AWS secret access key for the MyMLOps Backend service."
+  type        = "SecureString"
+  value       = aws_iam_access_key.mymlops_backend.secret
+}
+
+
+################################################################################
+# MyMLOps backend: Tooling service
+################################################################################
 
 resource "aws_db_subnet_group" "mymlops_tooling_db" {
   name       = "mymlops_tooling_db_main"
@@ -969,7 +1013,9 @@ resource "aws_ssm_parameter" "mymlops_tooling_database_connection_uri" {
   value       = "postgres://${urlencode("${aws_db_instance.mymlops_tooling_db.username}")}:${urlencode("${aws_db_instance.mymlops_tooling_db.password}")}@${aws_db_instance.mymlops_tooling_db.endpoint}/${aws_db_instance.mymlops_tooling_db.name}"
 }
 
-# Billing database
+################################################################################
+# MyMLOps backend: Billing service
+################################################################################
 
 resource "aws_db_subnet_group" "mymlops_billing_db" {
   name       = "mymlops_billing_db_main"
@@ -1015,7 +1061,9 @@ resource "aws_ssm_parameter" "mymlops_billing_database_connection_uri" {
   value       = "postgres://${urlencode("${aws_db_instance.mymlops_billing_db.username}")}:${urlencode("${aws_db_instance.mymlops_billing_db.password}")}@${aws_db_instance.mymlops_billing_db.endpoint}/${aws_db_instance.mymlops_billing_db.name}"
 }
 
-# Workspaces database
+################################################################################
+# MyMLOps backend: Workspaces service
+################################################################################
 
 resource "aws_db_subnet_group" "mymlops_workspaces_db" {
   name       = "mymlops_workspaces_db_main"
@@ -1061,44 +1109,80 @@ resource "aws_ssm_parameter" "mymlops_workspaces_database_connection_uri" {
   value       = "postgres://${urlencode("${aws_db_instance.mymlops_workspaces_db.username}")}:${urlencode("${aws_db_instance.mymlops_workspaces_db.password}")}@${aws_db_instance.mymlops_workspaces_db.endpoint}/${aws_db_instance.mymlops_workspaces_db.name}"
 }
 
-# IAM user
+# IAM role for EC2 service
 
-resource "aws_iam_user" "mymlops_backend" {
-  name = "MyMLOpsBackendService"
+resource "aws_iam_role" "mymlops_workspaces_service_role" {
+  name = "MyMLOpsWorkspacesServiceRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          // Allow our AWS account to assume this role.
+          AWS = "arn:aws:iam::045329000471:root"
+        }
+      },
+    ]
+  })
 }
 
-resource "aws_iam_access_key" "mymlops_backend" {
-  user = aws_iam_user.mymlops_backend.name
+resource "aws_iam_policy" "mymlops_workspaces_service_policy" {
+  name        = "EC2AccessForMyMLOpsWorkspacesService"
+  description = "Allows MyMLOps workspaces service to access the EC2 services."
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:DescribeInstances",
+          "ec2:RunInstances",
+          "ec2:CreateTags",
+          "ec2:StartInstances",
+          "ec2:StopInstances",
+          "ec2:TerminateInstances"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
 }
 
-resource "aws_iam_user_policy" "mymlops_backend_policy" {
-  name = "SESAccessForMyMLOpsBackendService"
-  user = aws_iam_user.mymlops_backend.name
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "ses:SendEmail",
-      "Resource": ["*"]
-    }
-  ]
-}
-EOF
+resource "aws_iam_role_policy_attachment" "mymlops_workspaces_service_policy_attachment" {
+  role       = aws_iam_role.mymlops_workspaces_service_role.name
+  policy_arn = aws_iam_policy.mymlops_workspaces_service_policy.arn
 }
 
-resource "aws_ssm_parameter" "mymlops_backend_access_key_id" {
-  name        = var.mymlops_backend_access_key_id_path
-  description = "The AWS access key id for the MyMLOps Backend service."
+resource "aws_ssm_parameter" "mymlops_workspaces_role_arn" {
+  name        = var.mymlops_workspaces_role_arn_path
+  description = "The role ARN for the MyMLOps workspaces service."
   type        = "String"
-  value       = aws_iam_access_key.mymlops_backend.id
+  value       = aws_iam_role.mymlops_workspaces_service_role.arn
 }
 
-resource "aws_ssm_parameter" "mymlops_backend_secret_access_key" {
-  name        = var.mymlops_backend_secret_access_key_path
-  description = "The AWS secret access key for the MyMLOps Backend service."
-  type        = "SecureString"
-  value       = aws_iam_access_key.mymlops_backend.secret
+# Network and subnets for placing workspaces
+
+data "aws_availability_zones" "available" {}
+
+module "network" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "3.14.2"
+
+  name                 = "mymlops-workspaces-network"
+  cidr                 = "10.0.0.0/16"
+  azs                  = data.aws_availability_zones.available.names
+  public_subnets       = ["10.0.1.0/24"]
+  enable_nat_gateway   = false
+  enable_dns_hostnames = true
+}
+
+resource "aws_ssm_parameter" "mymlops_workspaces_subnet_id" {
+  name        = var.mymlops_workspaces_subnet_id_path
+  description = "The subnet ID for the MyMLOps workspaces service."
+  type        = "String"
+  value       = module.network.public_subnets[0]
 }
