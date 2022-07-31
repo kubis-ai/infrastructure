@@ -917,13 +917,13 @@ resource "aws_ssm_parameter" "billing_database_connection_uri" {
   value       = "postgres://${urlencode("${aws_db_instance.billing_db.username}")}:${urlencode("${aws_db_instance.billing_db.password}")}@${aws_db_instance.billing_db.endpoint}/${aws_db_instance.billing_db.name}"
 }
 
+################################################################################
+# MyMLOps backend 
+################################################################################
 
-################################################################################
-# MyMLOps backend: Contact service
-################################################################################
 
 resource "aws_iam_user" "mymlops_backend" {
-  name = "MyMLOpsBackendContactService"
+  name = "MyMLOpsBackend"
 }
 
 resource "aws_iam_access_key" "mymlops_backend" {
@@ -931,7 +931,7 @@ resource "aws_iam_access_key" "mymlops_backend" {
 }
 
 resource "aws_iam_user_policy" "mymlops_backend_policy" {
-  name = "SESAccessForMyMLOpsBackendService"
+  name = "AssumeRoleForMyMLOpsBackend"
   user = aws_iam_user.mymlops_backend.name
 
   policy = <<EOF
@@ -940,7 +940,7 @@ resource "aws_iam_user_policy" "mymlops_backend_policy" {
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": "ses:SendEmail",
+      "Action": "sts:AssumeRole",
       "Resource": ["*"]
     }
   ]
@@ -950,18 +950,71 @@ EOF
 
 resource "aws_ssm_parameter" "mymlops_backend_access_key_id" {
   name        = var.mymlops_backend_access_key_id_path
-  description = "The AWS access key id for the MyMLOps Backend service."
+  description = "The AWS access key id for MyMLOps Backend."
   type        = "String"
   value       = aws_iam_access_key.mymlops_backend.id
 }
 
 resource "aws_ssm_parameter" "mymlops_backend_secret_access_key" {
   name        = var.mymlops_backend_secret_access_key_path
-  description = "The AWS secret access key for the MyMLOps Backend service."
+  description = "The AWS secret access key for MyMLOps Backend."
   type        = "SecureString"
   value       = aws_iam_access_key.mymlops_backend.secret
 }
 
+
+################################################################################
+# MyMLOps backend: Contact service
+################################################################################
+
+
+resource "aws_iam_role" "mymlops_contact_service_role" {
+  name = "MyMLOpsContactServiceRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          // Allow our AWS account to assume this role.
+          AWS = "arn:aws:iam::045329000471:root"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "mymlops_contact_service_policy" {
+  name        = "SESAccessForMyMLOpsContactService"
+  description = "Allows MyMLOps contact service to access SES services."
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ses:SendEmail"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "mymlops_contact_service_policy_attachment" {
+  role       = aws_iam_role.mymlops_contact_service_role.name
+  policy_arn = aws_iam_policy.mymlops_contact_service_policy.arn
+}
+
+resource "aws_ssm_parameter" "mymlops_contact_role_arn" {
+  name        = var.mymlops_contact_role_arn_path
+  description = "The role ARN for the MyMLOps contact service."
+  type        = "String"
+  value       = aws_iam_role.mymlops_contact_service_role.arn
+}
 
 ################################################################################
 # MyMLOps backend: Tooling service

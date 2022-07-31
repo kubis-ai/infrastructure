@@ -281,6 +281,11 @@ variable "billing_database_connection_uri_path" {
 # MyMLOps backend service
 ################################################################################
 
+variable "mymlops_contact_role_arn_path" {
+  description = "The path to the role ARN for the MyMLOps contact service."
+  type        = string
+}
+
 variable "mymlops_tooling_db_instance_class" {
   description = "The instance class for the MyMLOps tooling service database."
   type        = string
