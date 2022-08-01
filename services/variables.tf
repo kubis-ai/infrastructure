@@ -361,6 +361,11 @@ variable "mymlops_workspaces_database_connection_uri_path" {
   type        = string
 }
 
+variable "mymlops_workspaces_redis_connection_uri_path" {
+  description = "The path to the MyMLOps workspaces service Redis connection URI param in the AWS Parameter Store."
+  type        = string
+}
+
 variable "mymlops_workspaces_role_arn_path" {
   description = "The path to the role ARN for the MyMLOps workspaces service."
   type        = string

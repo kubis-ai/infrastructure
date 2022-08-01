@@ -921,7 +921,6 @@ resource "aws_ssm_parameter" "billing_database_connection_uri" {
 # MyMLOps backend 
 ################################################################################
 
-
 resource "aws_iam_user" "mymlops_backend" {
   name = "MyMLOpsBackend"
 }
@@ -962,11 +961,9 @@ resource "aws_ssm_parameter" "mymlops_backend_secret_access_key" {
   value       = aws_iam_access_key.mymlops_backend.secret
 }
 
-
 ################################################################################
 # MyMLOps backend: Contact service
 ################################################################################
-
 
 resource "aws_iam_role" "mymlops_contact_service_role" {
   name = "MyMLOpsContactServiceRole"
@@ -1238,4 +1235,67 @@ resource "aws_ssm_parameter" "mymlops_workspaces_subnet_id" {
   description = "The subnet ID for the MyMLOps workspaces service."
   type        = "String"
   value       = module.network.public_subnets[0]
+}
+
+# Redis cluster
+
+resource "random_password" "mymlops_workspaces_redis_password" {
+  length = 16
+}
+
+resource "aws_memorydb_user" "mymlops_workspaces_redis_user" {
+  user_name     = "mymlops-workspaces"
+  access_string = "on ~* &* +@all"
+
+  authentication_mode {
+    type      = "password"
+    passwords = [random_password.mymlops_workspaces_redis_password.result]
+  }
+}
+
+resource "aws_memorydb_acl" "mymlops_workspaces_redis_acl" {
+  name       = "mymlops-workspaces-acl"
+  user_names = [aws_memorydb_user.mymlops_workspaces_redis_user.id]
+}
+
+resource "aws_memorydb_subnet_group" "mymlops_workspaces_subnets" {
+  name = "mymlops-workspaces-subnets"
+  // The only supported AZs in us-east-1 are: [us-east-1d, us-east-1a, us-east-1c]
+  subnet_ids = [
+    data.terraform_remote_state.network.outputs.private_subnets[0],
+    data.terraform_remote_state.network.outputs.private_subnets[2]
+  ]
+}
+
+resource "aws_security_group" "allow_traffic_from_cluster_to_redis" {
+  name        = "allow_traffic_from_cluster_to_redis"
+  description = "Allow traffic from the cluster nodes to Redis."
+  vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
+
+  ingress {
+    description     = "Allows traffic on port 6379."
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [data.terraform_remote_state.cluster.outputs.worker_security_group_id]
+  }
+}
+
+resource "aws_memorydb_cluster" "mymlops_workspace_redis" {
+  acl_name               = aws_memorydb_acl.mymlops_workspaces_redis_acl.name
+  name                   = "mymlops-workspaces-cluster"
+  node_type              = "db.t4g.small"
+  engine_version         = "6.2"
+  num_shards             = 1
+  num_replicas_per_shard = 0
+  port                   = 6379
+  security_group_ids     = [aws_security_group.allow_traffic_from_cluster_to_redis.id]
+  subnet_group_name      = aws_memorydb_subnet_group.mymlops_workspaces_subnets.id
+}
+
+resource "aws_ssm_parameter" "mymlops_workspaces_redis_connection_uri" {
+  name        = var.mymlops_workspaces_redis_connection_uri_path
+  description = "The Redis connecton URI for the MyMLOps workspaces service."
+  type        = "String"
+  value       = "redis://${aws_memorydb_user.mymlops_workspaces_redis_user.id}:${random_password.mymlops_workspaces_redis_password.result}@${aws_memorydb_cluster.mymlops_workspace_redis.cluster_endpoint[0].address}:${aws_memorydb_cluster.mymlops_workspace_redis.cluster_endpoint[0].port}/0"
 }

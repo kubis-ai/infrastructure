@@ -124,6 +124,7 @@ mymlops_workspaces_db_final_snapshot_identifier = "mymlops-workspaces-db-final-s
 mymlops_tooling_database_connection_uri_path    = "/prod/mymlops-backend/tooling-database-connection-uri"
 mymlops_billing_database_connection_uri_path    = "/prod/mymlops-backend/billing-database-connection-uri"
 mymlops_workspaces_database_connection_uri_path = "/prod/mymlops-backend/workspaces-database-connection-uri"
+mymlops_workspaces_redis_connection_uri_path    = "/prod/mymlops-backend/workspaces-redis-connection-uri"
 mymlops_contact_role_arn_path                   = "/prod/mymlops-backend/contact-aws-role-arn"
 mymlops_workspaces_role_arn_path                = "/prod/mymlops-backend/workspaces-aws-role-arn"
 mymlops_workspaces_subnet_id_path               = "/prod/mymlops-backend/workspaces-subnet-id"
