@@ -1214,7 +1214,7 @@ resource "aws_ssm_parameter" "mymlops_workspaces_role_arn" {
   value       = aws_iam_role.mymlops_workspaces_service_role.arn
 }
 
-# Network and subnets for placing workspaces
+# Network, subnet and security group for placing workspaces
 
 data "aws_availability_zones" "available" {}
 
@@ -1235,6 +1235,27 @@ resource "aws_ssm_parameter" "mymlops_workspaces_subnet_id" {
   description = "The subnet ID for the MyMLOps workspaces service."
   type        = "String"
   value       = module.network.public_subnets[0]
+}
+
+resource "aws_security_group" "allow_traffic_to_workspace" {
+  name        = "mymlops-workspace-sg"
+  description = "Allow traffic to MyMLOps workspaces."
+  vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
+
+  ingress {
+    description = "Allows traffic on all ports."
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_ssm_parameter" "mymlops_workspaces_security_group_id" {
+  name        = var.mymlops_workspaces_security_group_id_path
+  description = "The security group ID for the MyMLOps workspaces service."
+  type        = "String"
+  value       = aws_security_group.allow_traffic_to_workspace.id
 }
 
 # Redis cluster

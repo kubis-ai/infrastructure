@@ -128,5 +128,6 @@ mymlops_workspaces_redis_connection_uri_path    = "/prod/mymlops-backend/workspa
 mymlops_contact_role_arn_path                   = "/prod/mymlops-backend/contact-aws-role-arn"
 mymlops_workspaces_role_arn_path                = "/prod/mymlops-backend/workspaces-aws-role-arn"
 mymlops_workspaces_subnet_id_path               = "/prod/mymlops-backend/workspaces-subnet-id"
+mymlops_workspaces_security_group_id_path       = "/prod/mymlops-backend/workspaces-security-group-id"
 mymlops_backend_access_key_id_path              = "/prod/mymlops-backend/aws-access-key-id"
 mymlops_backend_secret_access_key_path          = "/prod/mymlops-backend/aws-secret-access-key"

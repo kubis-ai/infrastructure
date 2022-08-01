@@ -376,6 +376,10 @@ variable "mymlops_workspaces_subnet_id_path" {
   type        = string
 }
 
+variable "mymlops_workspaces_security_group_id_path" {
+  description = "The path to the security group ID for the MyMLOps workspaces service."
+  type        = string
+}
 
 variable "mymlops_backend_access_key_id_path" {
   description = "The path to the AWS access key id param in the AWS Parameter Store."
