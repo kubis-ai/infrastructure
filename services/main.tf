@@ -1297,5 +1297,5 @@ resource "aws_ssm_parameter" "mymlops_workspaces_redis_connection_uri" {
   name        = var.mymlops_workspaces_redis_connection_uri_path
   description = "The Redis connecton URI for the MyMLOps workspaces service."
   type        = "String"
-  value       = "redis://${urlencode(aws_memorydb_user.mymlops_workspaces_redis_user.id)}:${urlencode(random_password.mymlops_workspaces_redis_password.result)}@${aws_memorydb_cluster.mymlops_workspace_redis.cluster_endpoint[0].address}:${aws_memorydb_cluster.mymlops_workspace_redis.cluster_endpoint[0].port}/0"
+  value       = "rediss://${urlencode(aws_memorydb_user.mymlops_workspaces_redis_user.id)}:${urlencode(random_password.mymlops_workspaces_redis_password.result)}@${aws_memorydb_cluster.mymlops_workspace_redis.cluster_endpoint[0].address}:${aws_memorydb_cluster.mymlops_workspace_redis.cluster_endpoint[0].port}/0"
 }
