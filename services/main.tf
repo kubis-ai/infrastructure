@@ -1240,7 +1240,7 @@ resource "aws_ssm_parameter" "mymlops_workspaces_subnet_id" {
 resource "aws_security_group" "allow_traffic_to_workspace" {
   name        = "mymlops-workspace-sg"
   description = "Allow traffic to MyMLOps workspaces."
-  vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
+  vpc_id      = module.network.vpc_id
 
   ingress {
     description = "Allows traffic on all ports."
