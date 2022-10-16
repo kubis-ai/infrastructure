@@ -508,6 +508,25 @@ resource "aws_route53_record" "dmarc" {
   records = ["v=DMARC1;p=quarantine;pct=100;fo=1;"]
 }
 
+################################################################################
+# Mailchimp - MyMLOps
+################################################################################
+
+resource "aws_route53_record" "mailchimp1" {
+  zone_id = data.aws_route53_zone.mymlops.zone_id
+  name    = "k2._domainkey"
+  type    = "CNAME"
+  ttl     = 600
+  records = ["dkim2.mcsv.net"]
+}
+
+resource "aws_route53_record" "mailchimp2" {
+  zone_id = data.aws_route53_zone.mymlops.zone_id
+  name    = "k3._domainkey"
+  type    = "CNAME"
+  ttl     = 600
+  records = ["dkim3.mcsv.net"]
+}
 
 ################################################################################
 # Container registry
@@ -620,7 +639,7 @@ resource "aws_db_instance" "filesystem_db" {
   name = "filesystem_db"
 
   engine            = "postgres"
-  engine_version    = "13.4"
+  engine_version    = "13.7"
   instance_class    = var.filesystem_db_instance_class
   allocated_storage = var.filesystem_db_allocated_storage
 
@@ -679,7 +698,7 @@ resource "aws_db_instance" "cloud_db" {
   name = "cloud_db"
 
   engine            = "postgres"
-  engine_version    = "13.4"
+  engine_version    = "13.7"
   instance_class    = var.cloud_db_instance_class
   allocated_storage = var.cloud_db_allocated_storage
 
@@ -839,7 +858,7 @@ resource "aws_db_instance" "notebook_db" {
   name = "notebook_db"
 
   engine            = "postgres"
-  engine_version    = "13.4"
+  engine_version    = "13.7"
   instance_class    = var.notebook_db_instance_class
   allocated_storage = var.notebook_db_allocated_storage
 
@@ -891,7 +910,7 @@ resource "aws_db_instance" "billing_db" {
   name = "billing_db"
 
   engine            = "postgres"
-  engine_version    = "13.4"
+  engine_version    = "13.7"
   instance_class    = var.billing_db_instance_class
   allocated_storage = var.billing_db_allocated_storage
 
@@ -1034,7 +1053,7 @@ resource "aws_db_instance" "mymlops_tooling_db" {
   identifier = "mymlops-tooling-db"
 
   engine            = "postgres"
-  engine_version    = "13.4"
+  engine_version    = "13.7"
   instance_class    = var.mymlops_tooling_db_instance_class
   allocated_storage = var.mymlops_tooling_db_allocated_storage
 
@@ -1083,7 +1102,7 @@ resource "aws_db_instance" "mymlops_billing_db" {
   identifier = "mymlops-billing-db"
 
   engine            = "postgres"
-  engine_version    = "13.4"
+  engine_version    = "13.7"
   instance_class    = var.mymlops_billing_db_instance_class
   allocated_storage = var.mymlops_billing_db_allocated_storage
 
@@ -1131,7 +1150,7 @@ resource "aws_db_instance" "mymlops_workspaces_db" {
   identifier = "mymlops-workspaces-db"
 
   engine            = "postgres"
-  engine_version    = "13.4"
+  engine_version    = "13.7"
   instance_class    = var.mymlops_workspaces_db_instance_class
   allocated_storage = var.mymlops_workspaces_db_allocated_storage
 
