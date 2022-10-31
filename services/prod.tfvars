@@ -44,7 +44,7 @@ firebase_mymlops_auth_domain_path = "/prod/auth/firebase-mymlops-auth-domain"
 # Container registry
 ################################################################################
 
-repository_list = ["website", "docs", "blog", "admin", "auth", "billing", "filesystem", "cloud", "notebook", "mymlops", "mymlops-backend"]
+repository_list = ["website", "docs", "blog", "admin", "auth", "billing", "filesystem", "cloud", "notebook", "mymlops", "mymlops-backend", "personal-website"]
 
 ################################################################################
 # Filesystem service
