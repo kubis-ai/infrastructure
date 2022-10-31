@@ -18,12 +18,22 @@ variable "subdomains" {
 }
 
 variable "mymlops_domain" {
-  description = "My MLOps tool domain"
+  description = "MyMLOps tool domain"
   type        = string
 }
 
 variable "mymlops_subdomains" {
-  description = "List of My MLOps subdomains."
+  description = "List of MyMLOps subdomains."
+  type        = list(string)
+}
+
+variable "nathaliacampos_domain" {
+  description = "Personal website domain"
+  type        = string
+}
+
+variable "nathaliacampos_subdomains" {
+  description = "List of personal website subdomains."
   type        = list(string)
 }
 

@@ -4,10 +4,12 @@ aws_region = "us-east-1"
 # DNS (TLS certificates)
 ################################################################################
 
-domain             = "kubis.ai"
-subdomains         = ["*.kubis.ai"]
-mymlops_domain     = "mymlops.com"
-mymlops_subdomains = ["*.mymlops.com"]
+domain                    = "kubis.ai"
+subdomains                = ["*.kubis.ai"]
+mymlops_domain            = "mymlops.com"
+mymlops_subdomains        = ["*.mymlops.com"]
+nathaliacampos_domain     = "nathaliacampos.me"
+nathaliacampos_subdomains = ["*.nathaliacampos.me"]
 
 ################################################################################
 # Cluster

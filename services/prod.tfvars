@@ -16,6 +16,8 @@ mymlops_domain      = "mymlops.com"
 mymlops_api_domain  = "api.mymlops.com"
 mymlops_auth_domain = "auth.mymlops.com"
 
+nathaliacampos_domain = "nathaliacampos.me"
+
 ################################################################################
 # Email (SES)
 ################################################################################

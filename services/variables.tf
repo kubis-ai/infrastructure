@@ -43,17 +43,22 @@ variable "admin_domain" {
 }
 
 variable "mymlops_domain" {
-  description = "My MLOps domain name."
+  description = "MyMLOps domain name."
   type        = string
 }
 
 variable "mymlops_api_domain" {
-  description = "My MLOps API domain name."
+  description = "MyMLOps API domain name."
   type        = string
 }
 
 variable "mymlops_auth_domain" {
-  description = "My MLOps auth domain name."
+  description = "MyMLOps auth domain name."
+  type        = string
+}
+
+variable "nathaliacampos_domain" {
+  description = "nathaliacampos.me domain name."
   type        = string
 }
 
