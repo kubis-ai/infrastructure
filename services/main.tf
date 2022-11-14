@@ -339,6 +339,22 @@ module "mymlops_dns" {
   ]
 }
 
+module "nathaliacampos_dns" {
+  source = "git@github.com:kubis-ai/terraform-modules.git//modules/dns"
+
+  domain = var.nathaliacampos_domain
+
+  # All domains pointing to a CloudFront distribution must also be configured as
+  # aliases in the CloudFront settings.
+  alias = [
+    {
+      source  = var.nathaliacampos_domain,
+      target  = aws_cloudfront_distribution.nathaliacampos_alb_distribution.domain_name
+      zone_id = aws_cloudfront_distribution.nathaliacampos_alb_distribution.hosted_zone_id
+    }
+  ]
+}
+
 ################################################################################
 # Authentication (Firebase)
 ################################################################################

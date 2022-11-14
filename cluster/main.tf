@@ -50,6 +50,10 @@ module "cluster" {
     {
       alb_security_group_id = module.mymlops_alb.security_group_id
       application_ports     = [local.http_node_port, local.https_node_port, local.health_check_port]
+    },
+    {
+      alb_security_group_id = module.nathaliacampos_alb.security_group_id
+      application_ports     = [local.http_node_port, local.https_node_port, local.health_check_port]
     }
   ]
 
@@ -65,7 +69,7 @@ module "cluster" {
     asg_max_size            = var.spot_workers.asg_max_size
     spot_price              = var.spot_workers.spot_price
     kubelet_extra_args      = var.spot_workers.kubelet_extra_args,
-    target_group_arns       = concat(values(module.alb.target_group_arns), values(module.mymlops_alb.target_group_arns))
+    target_group_arns       = concat(values(module.alb.target_group_arns), values(module.mymlops_alb.target_group_arns), values(module.nathaliacampos_alb.target_group_arns))
   }]
 }
 
