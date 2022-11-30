@@ -335,7 +335,12 @@ module "mymlops_dns" {
       source  = var.mymlops_api_domain
       target  = data.terraform_remote_state.cluster.outputs.mymlops_alb_dns_name
       zone_id = data.terraform_remote_state.cluster.outputs.mymlops_alb_zone_id
-    }
+    },
+    {
+      source  = var.mymlops_admin_domain
+      target  = data.terraform_remote_state.cluster.outputs.mymlops_alb_dns_name
+      zone_id = data.terraform_remote_state.cluster.outputs.mymlops_alb_zone_id
+    },
   ]
 }
 

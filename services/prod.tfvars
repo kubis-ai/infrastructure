@@ -15,6 +15,7 @@ admin_domain = "admin.kubis.ai"
 mymlops_domain      = "mymlops.com"
 mymlops_api_domain  = "api.mymlops.com"
 mymlops_auth_domain = "auth.mymlops.com"
+mymlops_admin_domain = "admin.mymlops.com"
 
 nathaliacampos_domain = "nathaliacampos.me"
 
@@ -46,7 +47,19 @@ firebase_mymlops_auth_domain_path = "/prod/auth/firebase-mymlops-auth-domain"
 # Container registry
 ################################################################################
 
-repository_list = ["website", "docs", "blog", "admin", "auth", "billing", "filesystem", "cloud", "notebook", "mymlops", "mymlops-backend", "personal-website"]
+repository_list = ["website",
+"docs",
+"blog",
+"admin",
+"auth",
+"billing",
+"filesystem",
+"cloud",
+"notebook",
+"mymlops",
+"mymlops-backend",
+"mymlops-admin",
+"personal-website"]
 
 ################################################################################
 # Filesystem service
