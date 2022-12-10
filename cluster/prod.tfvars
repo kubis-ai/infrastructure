@@ -17,7 +17,7 @@ nathaliacampos_subdomains = ["*.nathaliacampos.me"]
 
 cluster_name = "kubis-prod"
 
-kubernetes_version = "1.21"
+kubernetes_version = "1.22"
 
 spot_workers = {
   name                    = "spot"
