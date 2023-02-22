@@ -361,6 +361,27 @@ module "nathaliacampos_dns" {
 }
 
 ################################################################################
+# Google Search Console (nathaliacampos.me)
+################################################################################
+
+data "aws_route53_zone" "nathaliacampos" {
+  name = var.nathaliacampos_domain
+}
+
+// This record is for verification on google search console.
+resource "aws_route53_record" "google_search_console_txt" {
+  zone_id = data.aws_route53_zone.nathaliacampos.zone_id
+  name    = "nathaliacampos.me"
+  type    = "TXT"
+  ttl     = "5"
+
+  records = [
+    "google-site-verification=vlh6zhg1Kd5vtGiGBDNfxriCybZTUW4w0eFx40SxHdI"
+  ]
+}
+
+
+################################################################################
 # Authentication (Firebase)
 ################################################################################
 
